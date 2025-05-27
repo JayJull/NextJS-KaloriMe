@@ -1,9 +1,9 @@
-import React from 'react'
+'use client' 
 
-const page = () => {
+import LoginView from '../../src/views/login/login-view';
+
+export default function page(){
   return (
-    <div>page</div>
-  )
+    <LoginView />
+  );
 }
-
-export default page
