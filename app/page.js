@@ -1,8 +1,57 @@
+"use client"
 import Image from "next/image";
 import LandingTabs from "./LandingTabs/landingtabs";
-import { MdRestaurant, MdSearch, MdEco } from "react-icons/md";
+import { MdRestaurant, MdSearch, MdEco, } from "react-icons/md";
+import { FaArrowUp, FaFacebook, FaInstagram, FaTwitter } from 'react-icons/fa';
+import { useState, useRef, useEffect } from "react";
 
 export default function Home() {
+  const [activeSection, setActiveSection] = useState("beranda");
+
+  const berandaRef = useRef(null);
+  const programdietRef = useRef(null);
+  const carakerjaRef = useRef(null);
+  const tentangkamiRef = useRef(null);
+  const [showButton, setShowButton] = useState(false);
+
+
+  const scrollToSection = (ref,sectionName) => {
+    setActiveSection(sectionName);
+    ref.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowButton(window.scrollY > 300);
+
+      const sections = [
+        { name: "beranda", ref: berandaRef },
+        { name: "programdiet", ref: programdietRef },
+        { name: "carakerja", ref: carakerjaRef },
+        { name: "tentangkami", ref: tentangkamiRef },
+      ];
+
+      const scrollPosition = window.scrollY + window.innerHeight / 2;
+
+      for (const section of sections) {
+        const el = section.ref.current;
+        if (el) {
+          const { top, bottom } = el.getBoundingClientRect();
+          const offsetTop = top + window.scrollY;
+          const offsetBottom = bottom + window.scrollY;
+
+          if (scrollPosition >= offsetTop && scrollPosition < offsetBottom) {
+            setActiveSection(section.name);
+            break;
+          }
+        }
+      }
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   return (
     <div className="min-h-screen bg-white">
       {/* Navbar */}
@@ -30,10 +79,10 @@ export default function Home() {
             
             {/* Desktop Navigation */}
             <div className="hidden md:flex items-center space-x-12 text-lg">
-              <a href="#" className="text-white hover:underline underline-offset-5 font-bold">Beranda</a>
-              <a href="#" className="text-white hover:underline underline-offset-5 font-bold">Program Diet</a>
-              <a href="#" className="text-white hover:underline underline-offset-5 font-bold">Cara Kerja</a>
-              <a href="#" className="text-white hover:underline underline-offset-5 font-bold">Tentang Kami</a>
+              <button onClick={() => scrollToSection(berandaRef, "beranda")} className={`text-white hover:underline underline-offset-5 font-bold ${activeSection === "beranda" ? "underline" : ""}`}>Beranda</button>
+              <button onClick={() => scrollToSection(programdietRef, "programdiet")} className={`text-white hover:underline underline-offset-5 font-bold ${activeSection === "programdiet" ? "underline" : ""}`}>Program Diet</button>
+              <button onClick={() => scrollToSection(carakerjaRef, "carakerja")} className={`text-white hover:underline underline-offset-5 font-bold ${activeSection === "carakerja" ? "underline" : ""}`}>Cara Kerja</button>
+              <button onClick={() => scrollToSection(tentangkamiRef, "tentangkami")} className={`text-white hover:underline underline-offset-5 font-bold ${activeSection === "tentangkami" ? "underline" : ""}`}>Tentang Kami</button>
 
               <div className="flex items-center space-x-4 ml-8">
                 <a href="/register" className="bg-white text-teal-600 px-6 py-2 rounded-full font-semibold border border-white hover:bg-transparent hover:text-white transition-colors duration-300">
@@ -58,7 +107,7 @@ export default function Home() {
       </nav>
 
     {/* Hero Section */}
-      <section className="relative overflow-hidden min-h-screen flex items-center" 
+      <section id="beranda" ref={berandaRef} className="relative overflow-hidden min-h-screen flex items-center" 
                style={{ 
                 backgroundColor: '#00A999',
                 backgroundImage: "url('/images/grey-felt-texture.jpg')"
@@ -174,7 +223,7 @@ export default function Home() {
       </section>
       
       {/* Isi Konten 1 */}
-      <section className="py-16 bg-white text-center px-4">
+      <section id="programdiet" ref={programdietRef} className="py-16 bg-white text-center px-4">
 
         <h2 className="text-3xl lg:text-5xl font-bold text-red-600 mb-4 tracking-tight">
           Temukan KaloriME
@@ -188,7 +237,7 @@ export default function Home() {
       </section>
 
       {/* Isi Konten 2 */}
-      <section className="relative overflow-hidden min-h-screen flex items-center rounded-4xl"
+      <section id="carakerja" ref={carakerjaRef} className="relative overflow-hidden min-h-screen flex items-center rounded-4xl"
         style={{ 
                 backgroundColor: '#A6A6A6',
                 backgroundImage: "url('/images/gray-textured-wall.jpg')",
@@ -233,7 +282,7 @@ export default function Home() {
       </section>
 
       {/* Isi konten 3 */}
-      <section className="bg-white grid md:grid-cols-2 gap-10 items-center pt-15">
+      <section id="tentangkami" ref={tentangkamiRef} className="bg-white grid md:grid-cols-2 gap-10 items-center pt-15">
         <div className="flex justify-center">
             <div className="relative w-[350px] h-[430px] left-9 or left-[70px]">
                 <Image
@@ -308,10 +357,80 @@ export default function Home() {
 
 
       {/* Footer */}
-      <section className="bg-black py-16">
-        
-      </section>
+      <footer className="bg-black text-white py-10 px-6">
+      <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-10">
 
+        {/* Logo dan Sosial Media */}
+        <div className="flex flex-col items-start justify-center space-y-4">
+
+          {/* Logo Placeholder */}
+          <div>
+            <Image
+              src='/images/KaloriME2.png'
+              alt='Logo KaloriME'
+              width={250}
+              height={250}
+            />
+          </div>
+
+          {/* Icon Media Sosial */}
+          <div className="flex space-x-4 mt-2 text-white text-3xl">
+            <a href="#"><i className="fab fa-facebook-f text-xl"></i><FaFacebook/></a>
+            <a href="#"><i className="fab fa-instagram text-xl"></i><FaInstagram/></a>
+            <a href="#"><i className="fab fa-x-twitter text-xl"></i><FaTwitter/></a>
+          </div>
+        </div>
+
+        {/* Layanan */}
+        <div>
+          <h4 className="text-lg font-semibold mb-3">Layanan</h4>
+          <ul className="space-y-2 text-sm text-gray-300">
+            <li><a href="#">Lorem Ipsum</a></li>
+            <li><a href="#">Lorem Ipsum</a></li>
+            <li><a href="#">Lorem Ipsum</a></li>
+          </ul>
+        </div>
+
+        {/* Tautan Cepat */}
+        <div>
+          <h4 className="text-lg font-semibold mb-3">Tautan Cepat</h4>
+          <ul className="space-y-2 text-sm text-gray-300">
+            <li><a href="#">Lorem Ipsum</a></li>
+            <li><a href="#">Lorem Ipsum</a></li>
+            <li><a href="#">Lorem Ipsum</a></li>
+            <li><a href="#">Lorem Ipsum</a></li>
+          </ul>
+        </div>
+
+        {/* Legal */}
+        <div>
+          <h4 className="text-lg font-semibold mb-3">Legal</h4>
+          <ul className="space-y-2 text-sm text-gray-300">
+            <li><a href="#">Lorem Ipsum</a></li>
+            <li><a href="#">Lorem Ipsum</a></li>
+            <li><a href="#">Lorem Ipsum</a></li>
+            <li><a href="#">Lorem Ipsum</a></li>
+            <li><a href="#">Lorem Ipsum</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <hr className="my-8 border-gray-500" />
+
+      <div className="text-center text-sm text-gray-400">
+        © 2025 KaloriME.
+      </div>
+    </footer>
+
+      {/* button back to top */}
+      {showButton && (
+        <button
+          onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
+          className="fixed bottom-6 right-6 bg-teal-500 text-white px-6 py-6 rounded-full shadow-lg z-40 drop-shadow-lg hover: transition"
+        >
+          <FaArrowUp size={20} />
+        </button>
+      )}
     </div>
   );
 }
