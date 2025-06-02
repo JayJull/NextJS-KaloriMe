@@ -4,8 +4,11 @@ import LandingTabs from "./LandingTabs/landingtabs";
 import { MdRestaurant, MdSearch, MdEco, } from "react-icons/md";
 import { FaArrowUp, FaFacebook, FaInstagram, FaTwitter } from 'react-icons/fa';
 import { useState, useRef, useEffect } from "react";
+import LoginModal from "@/components/LoginModal";
 
 export default function Home() {
+
+   const [showLogin, setShowLogin] = useState(false);
   const [activeSection, setActiveSection] = useState("beranda");
 
   const berandaRef = useRef(null);
@@ -88,8 +91,15 @@ export default function Home() {
                 <a href="/register" className="bg-white text-teal-600 px-6 py-2 rounded-full font-semibold border border-white hover:bg-transparent hover:text-white transition-colors duration-300">
                   DAFTAR
                 </a>
-                <a href="/login" className="border border-white text-white px-6 py-2 rounded-full hover:bg-white hover:text-teal-600 transition-colors font-semibold duration-300">
-                  MASUK
+               <a
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setShowLogin(true);
+                  }}
+                  className="border border-white text-white px-6 py-2 rounded-full hover:bg-white hover:text-teal-600 transition-colors font-semibold duration-300"
+                >
+                  LOGIN
                 </a>
               </div>
             </div>
@@ -220,6 +230,7 @@ export default function Home() {
             </div>
           </div>
         </div>
+      <LoginModal isOpen={showLogin} onClose={() => setShowLogin(false)} />
       </section>
       
       {/* Isi Konten 1 */}
