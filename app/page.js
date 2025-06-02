@@ -8,13 +8,21 @@ export default function Home() {
   const [showLogin, setShowLogin] = useState(false);
 
   return (
-    <div className="min-h-screen bg-gray-100">
+    <div className="min-h-screen bg-white">
       {/* Navbar */}
       <nav className="bg-white shadow-md">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between h-16 items-center">
             <div className="flex-shrink-0 flex items-center">
-              <span className="text-2xl font-bold text-teal-600">KaloriME</span>
+              <div className="">
+                <Image 
+                  src="/images/KaloriME Putih.png"
+                  alt="KaloriME"
+                  width={250}
+                  height={250}
+                  className="drop-shadow-lg"
+                />
+              </div> 
             </div>
             <div className="hidden md:flex items-center space-x-8">
               <a
@@ -61,6 +69,9 @@ export default function Home() {
                 >
                   REGISTER
                 </a>
+                <a href="/login" className="border border-white text-white px-6 py-2 rounded-full hover:bg-white hover:text-teal-600 transition-colors font-semibold duration-300">
+                  MASUK
+                </a>
               </div>
             </div>
 
@@ -89,7 +100,7 @@ export default function Home() {
       {/* Hero Section */}
       <section className="bg-gradient-to-br from-teal-400 via-teal-500 to-teal-600 relative overflow-hidden min-h-screen flex items-center">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full relative z-10">
-          <div className="flex justify-center items-center">
+          <div className="flex justify-center items-center -mt-40">
             <div className="text-white text-center w-full">
               <h1 className="text-4xl lg:text-6xl font-bold leading-tight mb-6">
                 Buat Perjalanan Sehatmu
@@ -102,6 +113,21 @@ export default function Home() {
               </p>
             </div>
           </div>
+        </div>
+
+        {/* Curve Bottom */}
+        <div className="absolute bottom-0 left-0 right-0 z-10">
+          <svg
+            viewBox="0 0 1440 80"
+            xmlns="http://www.w3.org/2000/svg"
+            className="w-full "
+          >
+            <path
+              fill="white"
+              
+              d="M0,0 C360,100 1080,100 1440,0 L1440,100 L0,100 Z"
+            />
+          </svg>
         </div>
 
         {/* Floating Images */}
