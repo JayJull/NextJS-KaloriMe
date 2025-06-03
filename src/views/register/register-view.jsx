@@ -5,7 +5,7 @@ import Link from 'next/link';
 
 const RegisterView = () => {
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-50 p-4">
+    
       <div className="w-full max-w-md bg-white rounded-xl shadow-md overflow-hidden p-8">
         {/* Header */}
         <div className="text-center mb-8">
@@ -107,7 +107,7 @@ className="w-full flex justify-center items-center bg-gradient-to-r from-teal-40
           </p>
         </div>
       </div>
-    </div>
+  
   );
 };
 
