@@ -9,7 +9,7 @@ export default function Sidebar({ activeMenu, setActiveMenu }) {
 
   const menuItems = [
     { name: 'Dashboard', icon: Home, path: '/dashboard' },
-    { name: 'Aktivitas', icon: Activity, path: '/aktivitas' },
+    { name: 'Makanan', icon: Activity, path: '/makanan' },
     { name: 'Scan / Upload', icon: Camera, path: '/upload' },
     { name: 'Laporan', icon: FileText, path: '/laporan' },
     { name: 'Pengaturan', icon: Settings, path: '/pengaturan' }

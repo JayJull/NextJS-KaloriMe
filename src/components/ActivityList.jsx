@@ -62,11 +62,7 @@ export default function ActivityList() {
           <p className="text-gray-600 text-sm mt-1">
             Total hari ini: <span className="font-semibold text-purple-600">{totalCalories} kalori</span>
           </p>
-        </div>
-        <button className="flex items-center gap-2 bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors text-sm font-medium">
-          <Plus size={16} />
-          Tambah Makanan
-        </button>
+        </div>  
       </div>
 
       <div className="space-y-4">
@@ -114,7 +110,7 @@ export default function ActivityList() {
       </div>
 
       {/* Quick Add Section */}
-      <div className="mt-6 pt-4 border-t border-gray-100">
+      {/* <div className="mt-6 pt-4 border-t border-gray-100">
         <p className="text-sm text-gray-600 mb-3">Tambah Cepat:</p>
         <div className="flex flex-wrap gap-2">
           {['Nasi Putih', 'Ayam Goreng', 'Sayur Bayam', 'Teh Manis', 'Pisang'].map((food) => (
@@ -126,7 +122,7 @@ export default function ActivityList() {
             </button>
           ))}
         </div>
-      </div>
+      </div> */}
     </div>
   )
 }

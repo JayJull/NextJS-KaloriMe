@@ -3,9 +3,9 @@
 import { useEffect } from 'react';
 import { FiX } from 'react-icons/fi';
 
-import LoginView from '../views/login/login-view';
+import RegisterView from '../views/register/register-view';
 
-const LoginModal = ({ isOpen, onClose }) => {
+const RegisterModal = ({ isOpen, onClose }) => {
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
@@ -15,8 +15,7 @@ const LoginModal = ({ isOpen, onClose }) => {
   }, [isOpen]);
 
   if (!isOpen) return null;
-
-  return (
+   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
       <div className="relative bg-white rounded-xl shadow-lg w-full max-w-md mx-1">
         <button
@@ -28,11 +27,11 @@ const LoginModal = ({ isOpen, onClose }) => {
         
         {/* Konten login */}
         <div className="p-8">
-          <LoginView />
+          <RegisterView />
         </div>
       </div>
     </div>
   );
 };
 
-export default LoginModal;
+export default RegisterModal;

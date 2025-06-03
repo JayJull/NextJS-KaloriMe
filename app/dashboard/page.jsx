@@ -53,7 +53,7 @@ export default function Dashboard() {
         </div>
 
         {/* Progress Chart */}
-        <ProgressChart />
+        {/* <ProgressChart /> */}
 
         {/* Recent Activity */}
         <ActivityList />

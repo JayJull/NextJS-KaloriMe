@@ -10,27 +10,29 @@ export default function UploadPage() {
   const fileInputRef = useRef(null)
   const [photoDataUrl, setPhotoDataUrl] = useState(null)
 
-  useEffect(() => {
-    async function startCamera() {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ video: true })
-        if (videoRef.current) {
-          videoRef.current.srcObject = stream
-        }
-      } catch (error) {
-        console.error('Gagal mengakses kamera:', error)
-      }
-    }
+useEffect(() => {
+  let stream;
 
-    startCamera()
-
-    return () => {
-      const stream = videoRef.current?.srcObject
-      if (stream) {
-        stream.getTracks().forEach(track => track.stop())
+  async function startCamera() {
+    try {
+      stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
       }
+    } catch (error) {
+      console.error('Gagal mengakses kamera:', error);
     }
-  }, [])
+  }
+
+  startCamera();
+
+  return () => {
+    if (stream) {
+      stream.getTracks().forEach((track) => track.stop());
+    }
+  };
+}, []);
+
 
   const handleCapture = () => {
     const canvas = canvasRef.current

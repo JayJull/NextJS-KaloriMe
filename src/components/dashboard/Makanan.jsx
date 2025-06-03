@@ -3,8 +3,8 @@ import { useState } from 'react'
 import Sidebar from '../layout/Sidebar'
 import Header from '../layout/Header'
 
-export default function AktivitasLayout({ children, title, subtitle }) {
-  const [activeMenu, setActiveMenu] = useState('Aktivitas')
+export default function MakananLayout({ children, title, subtitle }) {
+  const [activeMenu, setActiveMenu] = useState('Makanan')
 
   return (
     <div className="flex h-screen bg-gray-50">

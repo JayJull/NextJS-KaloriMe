@@ -5,10 +5,12 @@ import { MdRestaurant, MdSearch, MdEco, } from "react-icons/md";
 import { FaArrowUp, FaFacebook, FaInstagram, FaTwitter } from 'react-icons/fa';
 import { useState, useRef, useEffect } from "react";
 import LoginModal from "@/components/LoginModal";
+import RegisterModal from "@/components/RegisterModal";
 
 export default function Home() {
 
    const [showLogin, setShowLogin] = useState(false);
+   const [showRegister, setShowRegister] = useState(false);
   const [activeSection, setActiveSection] = useState("beranda");
 
   const berandaRef = useRef(null);
@@ -88,9 +90,7 @@ export default function Home() {
               <button onClick={() => scrollToSection(tentangkamiRef, "tentangkami")} className={`text-white hover:underline underline-offset-5 font-bold ${activeSection === "tentangkami" ? "underline" : ""}`}>Tentang Kami</button>
 
               <div className="flex items-center space-x-4 ml-8">
-                <a href="/register" className="bg-white text-teal-600 px-6 py-2 rounded-full font-semibold border border-white hover:bg-transparent hover:text-white transition-colors duration-300">
-                  DAFTAR
-                </a>
+                
                <a
                   href="#"
                   onClick={(e) => {
@@ -100,6 +100,16 @@ export default function Home() {
                   className="border border-white text-white px-6 py-2 rounded-full hover:bg-white hover:text-teal-600 transition-colors font-semibold duration-300"
                 >
                   LOGIN
+                </a>
+               <a
+                  href="#"
+                  onClick={(e) => {
+                    e.preventDefault();
+                    setShowRegister(true);
+                  }}
+                  className="border border-white text-white px-6 py-2 rounded-full hover:bg-white hover:text-teal-600 transition-colors font-semibold duration-300"
+                >
+                  DAFTAR
                 </a>
               </div>
             </div>
@@ -231,6 +241,7 @@ export default function Home() {
           </div>
         </div>
       <LoginModal isOpen={showLogin} onClose={() => setShowLogin(false)} />
+      <RegisterModal isOpen={showRegister} onClose={() => setShowRegister(false)} />
       </section>
       
       {/* Isi Konten 1 */}
