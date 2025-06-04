@@ -116,7 +116,7 @@ export default function Home() {
               <a href="#"
                  onClick={(e) => {e.preventDefault(); setShowLogin(true);}}
                  className="border border-white text-white px-4 py-2 xl:px-6 xl:py-2 rounded-full hover:bg-white hover:text-teal-600 transition-colors font-semibold duration-300"
-              >LOGIN</a>
+              >MASUK</a>
             </div>
 
             {/* Mobile Menu Button */}
@@ -186,7 +186,7 @@ export default function Home() {
               <a href="#"
                  onClick={(e) => {e.preventDefault(); setShowLogin(true);}}
                  className="border border-teal-600 text-teal-600 px-4 py-2 rounded-full font-semibold text-center hover:bg-teal-600 hover:text-white transition-colors duration-300"
-              >LOGIN</a>
+              >MASUK</a>
               </div>
             </div>
           </div>
