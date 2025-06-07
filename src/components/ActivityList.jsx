@@ -1,33 +1,9 @@
 'use client'
+import { activities } from '@/data/interface'
 import { Coffee, Utensils, Cookie, Plus, Clock } from 'lucide-react'
 
 export default function ActivityList() {
-  const activities = [
-    { 
-      id: 1,
-      time: '08:30', 
-      activity: 'Sarapan - Nasi Gudeg', 
-      calories: '420 kal',
-      type: 'breakfast',
-      description: 'Nasi gudeg dengan ayam dan telur'
-    },
-    { 
-      id: 2,
-      time: '12:15', 
-      activity: 'Makan Siang - Ayam Bakar', 
-      calories: '650 kal',
-      type: 'lunch',
-      description: 'Ayam bakar dengan nasi dan lalapan'
-    },
-    { 
-      id: 3,
-      time: '15:45', 
-      activity: 'Snack - Pisang Goreng', 
-      calories: '180 kal',
-      type: 'snack',
-      description: 'Pisang goreng dengan teh manis'
-    }
-  ]
+  const activities1 = activities
 
   const getIcon = (type) => {
     switch (type) {
@@ -47,7 +23,7 @@ export default function ActivityList() {
     }
   }
 
-  const totalCalories = activities.reduce((total, activity) => {
+  const totalCalories = activities1.reduce((total, activity) => {
     return total + parseInt(activity.calories.replace(' kal', ''))
   }, 0)
 
@@ -70,8 +46,8 @@ export default function ActivityList() {
       </div>
 
       <div className="space-y-4">
-        {activities.length > 0 ? (
-          activities.map((item) => {
+        {activities1.length > 0 ? (
+          activities1.map((item) => {
             const Icon = getIcon(item.type)
             const iconColorClass = getIconColor(item.type)
             

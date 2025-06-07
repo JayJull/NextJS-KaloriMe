@@ -8,7 +8,6 @@ export default function Header({ title, subtitle }) {
 
   const handleSearch = (e) => {
     e.preventDefault()
-    // Handle search logic here
     console.log('Search:', searchQuery)
   }
 
@@ -17,7 +16,6 @@ export default function Header({ title, subtitle }) {
   }
 
   const handleProfileClick = () => {
-    // Handle profile click
     console.log('Profile clicked')
   }
 
