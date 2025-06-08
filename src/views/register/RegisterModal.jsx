@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import { FiX } from 'react-icons/fi';
 
-import RegisterView from '../views/register/register-view';
+import RegisterView from './register-view';
 
 const RegisterModal = ({ isOpen, onClose }) => {
   useEffect(() => {

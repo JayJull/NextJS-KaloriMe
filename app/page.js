@@ -4,8 +4,8 @@ import LandingTabs from "../src/components/landingtabs";
 import { MdRestaurant, MdSearch, MdEco, } from "react-icons/md";
 import { FaArrowUp, FaFacebook, FaInstagram, FaTwitter } from 'react-icons/fa';
 import { useState, useRef, useEffect } from "react";
-import LoginModal from "@/components/LoginModal";
-import RegisterModal from "@/components/RegisterModal";
+import LoginModal from "@/views/login/LoginModal";
+import RegisterModal from "@/views/register/RegisterModal";
 import dynamic from 'next/dynamic';
 
 export default function Home() {

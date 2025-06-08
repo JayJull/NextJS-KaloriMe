@@ -2,7 +2,6 @@
 
 import StatCard from '@/components/StatCard'
 import ActivityList from '@/components/ActivityList'
-import ProgressChart from '@/components/ProgressChart'
 import App from '@/layout/app'
 
 import { TrendingUp, Target, Calendar, Coffee } from 'lucide-react'
@@ -52,11 +51,6 @@ export default function Dashboard() {
             <StatCard key={index} {...stat} />
           ))}
         </div>
-
-        {/* Progress Chart */}
-        {/* <ProgressChart /> */}
-
-        {/* Recent Activity */}
         <ActivityList />
       </div>
     </App>

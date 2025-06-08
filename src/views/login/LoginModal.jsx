@@ -3,7 +3,7 @@
 import { useEffect } from 'react';
 import { FiX } from 'react-icons/fi';
 
-import LoginView from '../views/login/login-view';
+import LoginView from './login-view';
 
 const LoginModal = ({ isOpen, onClose }) => {
   useEffect(() => {
