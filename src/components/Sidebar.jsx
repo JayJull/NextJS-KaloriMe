@@ -4,7 +4,6 @@ import { Home, Activity, FileText, Camera, Settings, LogOut } from 'lucide-react
 import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import clsx from 'clsx'
-import { signOut } from "next-auth/react"
 
 export default function Sidebar({ activeMenu, setActiveMenu }) {
   const router = useRouter()
@@ -14,7 +13,6 @@ export default function Sidebar({ activeMenu, setActiveMenu }) {
   const menuItems = [
     { name: 'Dashboard', icon: Home, path: '/dashboard' },
     { name: 'Makanan', icon: Activity, path: '/makanan' },
-    { name: 'Scan / Upload', icon: Camera, path: '/upload' },
     { name: 'Laporan', icon: FileText, path: '/laporan' },
     { name: 'Pengaturan', icon: Settings, path: '/pengaturan' }
   ]
@@ -96,19 +94,6 @@ export default function Sidebar({ activeMenu, setActiveMenu }) {
           })}
         </ul>
       </nav>
-
-      {/* Logout */}
-      <div className="p-2 border-t border-gray-100">
-        <button
-          onClick={() => signOut({callbackUrl: '/'})}
-          className="w-full flex items-center px-3 py-2 text-red-600 hover:bg-red-50 rounded-lg"
-        >
-          <LogOut size={20} />
-          {sidebarOpen && (
-            <span className="ml-3 font-medium">Keluar</span>
-          )}
-        </button>
-      </div>
     </div>
   )
 }

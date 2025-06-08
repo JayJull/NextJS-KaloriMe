@@ -2,11 +2,11 @@
 import Image from 'next/image';
 import { FiUser, FiMail, FiLock, FiArrowRight } from 'react-icons/fi';
 import { useState } from 'react';
-import LoginModal from "@/components/LoginModal";
-import RegisterModal from "@/components/RegisterModal";
+import LoginModal from "@/views/login/LoginModal";
+import RegisterModal from "@/views/register/RegisterModal";
 import { AnimatePresence } from 'framer-motion';
 
-const RegisterView = () => {
+const RegisterView = ({ onSwitchToRegister }) => {
   const [showLogin, setShowLogin] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
   const [formData, setFormData] = useState({
@@ -170,8 +170,7 @@ const RegisterView = () => {
             <button
               onClick={(e) => {
                 e.preventDefault();
-                setShowRegister(false);
-                setShowLogin(true);   
+                onSwitchToRegister();   
               }}
               className="font-medium text-teal-600 hover:text-teal-500 hover:underline"
             >

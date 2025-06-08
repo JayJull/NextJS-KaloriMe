@@ -1,33 +1,9 @@
 'use client'
+import { activities } from '@/data/interface'
 import { Coffee, Utensils, Cookie, Plus, Clock } from 'lucide-react'
 
 export default function ActivityList() {
-  const activities = [
-    { 
-      id: 1,
-      time: '08:30', 
-      activity: 'Sarapan - Nasi Gudeg', 
-      calories: '420 kal',
-      type: 'breakfast',
-      description: 'Nasi gudeg dengan ayam dan telur'
-    },
-    { 
-      id: 2,
-      time: '12:15', 
-      activity: 'Makan Siang - Ayam Bakar', 
-      calories: '650 kal',
-      type: 'lunch',
-      description: 'Ayam bakar dengan nasi dan lalapan'
-    },
-    { 
-      id: 3,
-      time: '15:45', 
-      activity: 'Snack - Pisang Goreng', 
-      calories: '180 kal',
-      type: 'snack',
-      description: 'Pisang goreng dengan teh manis'
-    }
-  ]
+  const activities1 = activities
 
   const getIcon = (type) => {
     switch (type) {
@@ -47,7 +23,7 @@ export default function ActivityList() {
     }
   }
 
-  const totalCalories = activities.reduce((total, activity) => {
+  const totalCalories = activities1.reduce((total, activity) => {
     return total + parseInt(activity.calories.replace(' kal', ''))
   }, 0)
 
@@ -62,12 +38,16 @@ export default function ActivityList() {
           <p className="text-gray-600 text-sm mt-1">
             Total hari ini: <span className="font-semibold text-purple-600">{totalCalories} kalori</span>
           </p>
-        </div>  
+        </div>
+        <button className="flex items-center gap-2 bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors text-sm font-medium">
+          <Plus size={16} />
+          Tambah Makanan
+        </button>
       </div>
 
       <div className="space-y-4">
-        {activities.length > 0 ? (
-          activities.map((item) => {
+        {activities1.length > 0 ? (
+          activities1.map((item) => {
             const Icon = getIcon(item.type)
             const iconColorClass = getIconColor(item.type)
             
@@ -110,7 +90,7 @@ export default function ActivityList() {
       </div>
 
       {/* Quick Add Section */}
-      {/* <div className="mt-6 pt-4 border-t border-gray-100">
+      <div className="mt-6 pt-4 border-t border-gray-100">
         <p className="text-sm text-gray-600 mb-3">Tambah Cepat:</p>
         <div className="flex flex-wrap gap-2">
           {['Nasi Putih', 'Ayam Goreng', 'Sayur Bayam', 'Teh Manis', 'Pisang'].map((food) => (
@@ -122,7 +102,7 @@ export default function ActivityList() {
             </button>
           ))}
         </div>
-      </div> */}
+      </div>
     </div>
   )
 }

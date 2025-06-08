@@ -1,10 +1,9 @@
 'use client'
-import DashboardLayout from '@/components/dashboard/Dashboard'
 import StatCard from '@/components/StatCard'
 import ActivityList from '@/components/ActivityList'
-import ProgressChart from '@/components/ProgressChart'
 
 import { TrendingUp, Target, Calendar, Coffee } from 'lucide-react'
+import App from '@/layout/app'
 
 export default function Dashboard() {
   const statsData = [
@@ -40,11 +39,10 @@ export default function Dashboard() {
   ]
 
   return (
-    <DashboardLayout 
-      title="Dashboard" 
-      
+    <App
+      title="Dashboard"
     >
-      <div className="p-6 space-y-6 bg-gray-50">
+      <div className="p-6 space-y-6">
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {statsData.map((stat, index) => (
@@ -52,12 +50,9 @@ export default function Dashboard() {
           ))}
         </div>
 
-        {/* Progress Chart */}
-        {/* <ProgressChart /> */}
-
         {/* Recent Activity */}
         <ActivityList />
       </div>
-    </DashboardLayout>
+    </App>
   )
 }

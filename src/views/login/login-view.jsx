@@ -1,14 +1,14 @@
 'use client'
 import Image from "next/image";
 import { FiMail, FiLock, FiArrowRight, FiLoader } from 'react-icons/fi';
-import RegisterModal from "@/components/RegisterModal";
-import LoginModal from "@/components/LoginModal";
+import RegisterModal from "@/views/register/RegisterModal";
+import LoginModal from "@/views/login/LoginModal";
 import { useState } from "react";
 import { AnimatePresence } from 'framer-motion';
 import { signIn } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 
-const LoginView = () => {
+const LoginView = ({ onSwitchToRegister }) => {
   const [showRegister, setShowRegister] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
   const [email, setEmail] = useState("")
@@ -134,8 +134,7 @@ const LoginView = () => {
               href="#"
               onClick={(e) => {
                 e.preventDefault();
-                setShowLogin(false);   
-                setShowRegister(true);
+                onSwitchToRegister();
               }}
               className="font-medium text-teal-600 hover:text-teal-500"
             >
@@ -164,19 +163,27 @@ const LoginView = () => {
 
       {/* Modal harus di luar kontainer */}
       <AnimatePresence>
-        {showRegister && (
-          <RegisterModal
-            isOpen={showRegister}
-            onClose={() => setShowRegister(false)}
+        {showLogin && (
+          <LoginModal
+            isOpen={showLogin}
+            onClose={() => setShowLogin(false)}
+            onSwitchToRegister={() => {
+              setShowLogin(false);
+              setShowRegister(true);
+            }}
           />
         )}
       </AnimatePresence>
 
       <AnimatePresence>
-        {showLogin && (
-          <LoginModal
-            isOpen={showLogin}
-            onClose={() => setShowLogin(false)}
+        {showRegister && (
+          <RegisterModal
+            isOpen={showRegister}
+            onClose={() => setShowRegister(false)}
+            onSwitchToRegister={() => {
+              setShowLogin(true);
+              setShowRegister(false);
+            }}
           />
         )}
       </AnimatePresence>

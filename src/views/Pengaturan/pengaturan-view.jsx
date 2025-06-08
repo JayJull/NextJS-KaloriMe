@@ -4,8 +4,9 @@ import { useSession } from 'next-auth/react'
 import { User, Mail, Target, Scale, Activity, Calendar, Utensils, Droplets, ArrowLeft } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from 'next/navigation'
+import App from "@/layout/app";
 
-export default function ProfilePage() {
+export default function Pengaturan() {
   const [name, setName] = useState("Tama Zidan");
   const [email, setEmail] = useState("tamazidan87@gmail.com");
   const [age, setAge] = useState("28");
@@ -80,21 +81,10 @@ export default function ProfilePage() {
     )
 
   return (
-    <div className="min-h-screen bg-teal-100">
+    <App>
+    <div className="min-h-screen">
       {/* Header */}
-      <div className="bg-white shadow-sm">
-        <button
-            onClick={() => {
-                if (window.history.length > 1) {
-                router.back()
-                } else {
-                router.push('/dashboard') 
-                }
-            }}
-            className="inline-flex items-center px-4 py-2 text-lg font-bold text-black bg-white rounded-lg hover:text-white hover:bg-teal-500 transition"
-            >
-            <ArrowLeft className="w-8 h-8" />
-        </button>
+      <div className="bg-white rounded-lg text-center shadow-sm ml-78 mr-78 mt-5">
         <div className="max-w-2xl mx-auto px-4 py-6">
           <div className="text-center">
             <div className="rounded-full mx-auto flex items-center justify-center text-white text-2xl font-bold mb-4">
@@ -210,41 +200,6 @@ export default function ProfilePage() {
               </div>
             </div>
 
-            {/* Goals */}
-            <div className="border-t pt-6">
-              <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center">
-                <Target className="w-5 h-5 mr-2" />
-                Target & Tujuan
-              </h3>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Target Berat Badan</label>
-                  <input
-                    className="w-full border border-gray-300 text-black rounded-lg px-3 py-2 focus:ring-2 focus:ring-teal-600 focus:border-transparent"
-                    value={targetWeight}
-                    onChange={(e) => setTargetWeight(e.target.value)}
-                    type="number"
-                    placeholder="kg"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">Tujuan</label>
-                  <select
-                    className="w-full border border-gray-300 text-black rounded-lg px-3 py-2 focus:ring-2 focus:ring-teal-600 focus:border-transparent"
-                    value={goal}
-                    onChange={(e) => setGoal(e.target.value)}
-                  >
-                    <option value="weight-loss">Menurunkan Berat Badan</option>
-                    <option value="weight-gain">Menaikkan Berat Badan</option>
-                    <option value="maintain">Mempertahankan Berat Badan</option>
-                    <option value="muscle-gain">Menambah Massa Otot</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-
             {/* Activity Level */}
             <div className="border-t pt-6">
               <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center">
@@ -320,5 +275,6 @@ export default function ProfilePage() {
         </div>
       </div>
     </div>
+    </App>
   );
 }

@@ -1,12 +1,13 @@
 "use client"
 import Image from "next/image";
-import LandingTabs from "./LandingTabs/landingtabs";
+import LandingTabs from "@/components/LandingTabs";
 import { MdRestaurant, MdSearch, MdEco, } from "react-icons/md";
 import { FaArrowUp, FaFacebook, FaInstagram, FaTwitter } from 'react-icons/fa';
 import { useState, useRef, useEffect } from "react";
-import LoginModal from "@/components/LoginModal";
-import RegisterModal from "@/components/RegisterModal";
+import LoginModal from "@/views/login/LoginModal";
+import RegisterModal from "@/views/register/RegisterModal";
 import dynamic from 'next/dynamic';
+import { AnimatePresence } from 'framer-motion';
 
 export default function Home() {
   const [showLogin, setShowLogin] = useState(false);
@@ -20,7 +21,7 @@ export default function Home() {
   const [showButton, setShowButton] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
-  const DynamicMap = dynamic(() => import('./Map/MapComponent'), {
+  const DynamicMap = dynamic(() => import('../src/components/MapComponent'), {
     ssr: false,
   });
 
@@ -62,6 +63,7 @@ export default function Home() {
   }, []);
 
   return (
+    <>
     <div className="min-h-screen bg-white">
       {/* Navbar */}
       <nav className="fixed top-0 left-0 right-0 z-50"
@@ -563,5 +565,32 @@ export default function Home() {
         </button>
       )}
     </div>
+    
+     <AnimatePresence>
+        {showLogin && (
+          <LoginModal
+            isOpen={showLogin}
+            onClose={() => setShowLogin(false)}
+            onSwitchToRegister={() => {
+              setShowLogin(false);
+              setShowRegister(true);
+            }}
+          />
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {showRegister && (
+          <RegisterModal
+            isOpen={showRegister}
+            onClose={() => setShowRegister(false)}
+            onSwitchToRegister={() => {
+              setShowLogin(true);
+              setShowRegister(false);
+            }}
+          />
+        )}
+      </AnimatePresence>
+      </>
   );
 }

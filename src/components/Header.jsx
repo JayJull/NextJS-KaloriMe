@@ -8,6 +8,7 @@ import 'react-datepicker/dist/react-datepicker.css'
 import Image from 'next/image'
 import { useSession } from "next-auth/react"
 import { useRouter } from 'next/navigation'
+import { signOut } from 'next-auth/react'
 
 export default function Header({ title, subtitle }) {
   const [searchQuery, setSearchQuery] = useState('')
@@ -282,10 +283,12 @@ const avatarSmall = session?.user?.image ? (
                     </div>
 
                     {/* Edit Profile Button */}
-                    <button 
-                      onClick={() => router.push('/profile')}
-                      className="mt-3 sm:mt-4 px-3 sm:px-4 py-1.5 border border-gray-400 rounded-full text-xs sm:text-sm text-teal-600 hover:bg-blue-100 font-medium">
-                      Edit Profile
+                    <button
+                        onClick={() => signOut({callbackUrl: '/'})}
+                        className="mt-5 w-full border border-red-600 rounded-full flex items-center justify-center px-3 py-2 text-red-600 hover:bg-red-100 rounded-lg"
+                    >
+                        <LogOut size={20} />
+                        <span className="ml-3 font-medium">Keluar</span>
                     </button>
                   </div>
                 </div>

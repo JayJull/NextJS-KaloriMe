@@ -1,16 +1,36 @@
- export const makanan = [
-    // Sarapan
-    { name: "Nasi Gudeg", calories: 350, category: "Sarapan", image: "/dummy/roti.jpg" },
-    { name: "Roti Bakar", calories: 280, category: "Sarapan", image: "🍞" },
-    { name: "Bubur Ayam", calories: 220, category: "Sarapan", image: "🍲" },
-    
-    // Makan Siang
-    { name: "Nasi Padang", calories: 650, category: "Makan Siang", image: "🍛" },
-    { name: "Ayam Geprek", calories: 580, category: "Makan Siang", image: "🍗" },
-    { name: "Gado-gado", calories: 320, category: "Makan Siang", image: "🥗" },
-    
-    // Makan Malam
-    { name: "Pecel Lele", calories: 420, category: "Makan Malam", image: "🐟" },
-    { name: "Bakso", calories: 350, category: "Makan Malam", image: "🍲" },
-    { name: "Rendang", calories: 480, category: "Makan Malam", image: "🥩" }
-  ];
+export const weekData = [
+    { day: 'Sen', calories: 1850, target: 2000 },
+    { day: 'Sel', calories: 1920, target: 2000 },
+    { day: 'Rab', calories: 1750, target: 2000 },
+    { day: 'Kam', calories: 2100, target: 2000 },
+    { day: 'Jum', calories: 1880, target: 2000 },
+    { day: 'Sab', calories: 2200, target: 2000 },
+    { day: 'Min', calories: 1250, target: 2000 }, // Hari ini
+  ]
+
+export const activities = [
+    { 
+      id: 1,
+      time: '08:30', 
+      activity: 'Sarapan - Nasi Gudeg', 
+      calories: '420 kal',
+      type: 'breakfast',
+      description: 'Nasi gudeg dengan ayam dan telur'
+    },
+    { 
+      id: 2,
+      time: '12:15', 
+      activity: 'Makan Siang - Ayam Bakar', 
+      calories: '650 kal',
+      type: 'lunch',
+      description: 'Ayam bakar dengan nasi dan lalapan'
+    },
+    { 
+      id: 3,
+      time: '15:45', 
+      activity: 'Snack - Pisang Goreng', 
+      calories: '180 kal',
+      type: 'snack',
+      description: 'Pisang goreng dengan teh manis'
+    }
+  ]

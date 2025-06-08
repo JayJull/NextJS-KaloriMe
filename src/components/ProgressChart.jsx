@@ -1,19 +1,12 @@
 'use client'
+import { weekData } from '@/data/interface'
 import { TrendingUp, Calendar } from 'lucide-react'
 
 export default function ProgressChart() {
   // Sample data untuk 7 hari terakhir
-  const weekData = [
-    { day: 'Sen', calories: 1850, target: 2000 },
-    { day: 'Sel', calories: 1920, target: 2000 },
-    { day: 'Rab', calories: 1750, target: 2000 },
-    { day: 'Kam', calories: 2100, target: 2000 },
-    { day: 'Jum', calories: 1880, target: 2000 },
-    { day: 'Sab', calories: 2200, target: 2000 },
-    { day: 'Min', calories: 1250, target: 2000 }, // Hari ini
-  ]
+  const weekData1 = weekData 
 
-  const maxCalories = Math.max(...weekData.map(d => Math.max(d.calories, d.target)))
+  const maxCalories = Math.max(...weekData1.map(d => Math.max(d.calories, d.target)))
 
   return (
     <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
