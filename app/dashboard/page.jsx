@@ -1,10 +1,10 @@
 'use client'
-
 import StatCard from '@/components/StatCard'
 import ActivityList from '@/components/ActivityList'
 import App from '@/layout/app'
 
 import { TrendingUp, Target, Calendar, Coffee } from 'lucide-react'
+import App from '@/layout/app'
 
 export default function Dashboard() {
   const statsData = [
@@ -41,8 +41,7 @@ export default function Dashboard() {
 
   return (
     <App
-      title="Dashboard" 
-      
+      title="Dashboard"
     >
       <div className="p-6 space-y-6">
         {/* Stats Grid */}

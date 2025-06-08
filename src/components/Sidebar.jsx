@@ -1,11 +1,14 @@
 'use client'
 import { useRouter, usePathname } from 'next/navigation'
 import { Home, Activity, FileText, Camera, Settings, LogOut } from 'lucide-react'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
+import Image from 'next/image'
+import clsx from 'clsx'
 
 export default function Sidebar({ activeMenu, setActiveMenu }) {
   const router = useRouter()
   const pathname = usePathname()
+  const [sidebarOpen, setSidebarOpen] = useState(true)
 
   const menuItems = [
     { name: 'Dashboard', icon: Home, path: '/dashboard' },
@@ -14,13 +17,27 @@ export default function Sidebar({ activeMenu, setActiveMenu }) {
     { name: 'Pengaturan', icon: Settings, path: '/pengaturan' }
   ]
 
-  // Update active menu berdasarkan pathname
+  // Atur active menu berdasarkan pathname
   useEffect(() => {
-    const currentMenu = menuItems.find(item => item.path === pathname)
-    if (currentMenu) {
-      setActiveMenu(currentMenu.name)
+    if (!activeMenu) {
+      const currentMenu = menuItems.find(item => item.path === pathname)
+      if (currentMenu) {
+        setActiveMenu(currentMenu.name)
+      }
     }
-  }, [pathname, setActiveMenu])
+  }, [pathname, menuItems, activeMenu])
+
+  // Atur sidebarOpen berdasarkan ukuran layar
+  useEffect(() => {
+    const handleResize = () => {
+      setSidebarOpen(window.innerWidth >= 768) // md: 768px
+    }
+
+    handleResize() // Set awal saat component mount
+    window.addEventListener('resize', handleResize)
+
+    return () => window.removeEventListener('resize', handleResize)
+  }, [])
 
   const handleMenuClick = (item) => {
     setActiveMenu(item.name)
@@ -28,59 +45,55 @@ export default function Sidebar({ activeMenu, setActiveMenu }) {
   }
 
   const handleLogout = () => {
-    // Handle logout logic here
     console.log('Logout clicked')
     // router.push('/login')
   }
 
   return (
-    <div className="w-64 bg-white shadow-sm flex flex-col">
+    <div
+      className={clsx(
+        'bg-white shadow-sm flex flex-col transition-all duration-300',
+        sidebarOpen ? 'w-64' : 'w-20'
+      )}
+    >
       {/* Logo */}
-      <div className="p-6 border-b border-gray-100">
-        <div className="flex items-center space-x-3">
-          <div className="w-8 h-8 bg-teal-600 rounded-lg flex items-center justify-center">
-            <span className="text-white font-bold text-sm">K</span>
-          </div>
-          <span className="text-xl font-bold text-gray-800">KaloriMe</span>
-        </div>
+      <div className="p-4 border-b border-gray-100 flex justify-center items-center">
+        <Image
+          src={sidebarOpen ? '/images/KaloriME2.png' : '/images/Logo KaloriME.png'}
+          alt="Logo KaloriME"
+          width={sidebarOpen ? 200 : 60}
+          height={60}
+          priority
+        />
       </div>
 
-      {/* Navigation */}
-      <nav className="flex-1 p-4">
-        <ul className="space-y-2">
+      {/* Menu Navigasi */}
+      <nav className="flex-1 p-2">
+        <ul className="space-y-1">
           {menuItems.map((item) => {
             const Icon = item.icon
             const isActive = activeMenu === item.name
-            
             return (
               <li key={item.name}>
                 <button
                   onClick={() => handleMenuClick(item)}
-                  className={`w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-left transition-colors ${
+                  className={clsx(
+                    'w-full flex items-center px-3 py-2 rounded-lg transition-colors lg:text-md xl:text-xl',
                     isActive
-                      ? 'bg-teal-100 text-teal-600 border-r-2 border-teal-600'
+                      ? 'bg-teal-100 text-teal-600 border-r-4 border-teal-600'
                       : 'text-gray-600 hover:bg-gray-50 hover:text-gray-800'
-                  }`}
+                  )}
                 >
                   <Icon size={20} />
-                  <span className="font-medium">{item.name}</span>
+                  {sidebarOpen && (
+                    <span className="ml-3 font-medium">{item.name}</span>
+                  )}
                 </button>
               </li>
             )
           })}
         </ul>
       </nav>
-
-      {/* Logout */}
-      <div className="p-4 border-t border-gray-100">
-        <button 
-          onClick={handleLogout}
-          className="w-full flex items-center space-x-3 px-4 py-3 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-        >
-          <LogOut size={20} />
-          <span className="font-medium">Keluar</span>
-        </button>
-      </div>
     </div>
   )
 }
