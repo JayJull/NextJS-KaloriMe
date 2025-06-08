@@ -1,6 +1,5 @@
 'use client'
-
-import UploadLayout from '@/components/dashboard/Upload'
+import App from '@/layout/app'
 import { Camera, Upload as UploadIcon } from 'lucide-react'
 import { useRef, useEffect, useState } from 'react'
 
@@ -59,7 +58,7 @@ export default function UploadPage() {
   }
 
   return (
-    <UploadLayout title="Upload Makanan">
+    <App title="Upload Makanan">
       <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100 space-y-6">
         {/* Opsi 1: Kamera */}
         <div className="space-y-2">
@@ -116,6 +115,6 @@ export default function UploadPage() {
         {/* Canvas tersembunyi */}
         <canvas ref={canvasRef} className="hidden"></canvas>
       </div>
-    </UploadLayout>
+    </App>
   )
 }

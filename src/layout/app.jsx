@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
-import Sidebar from "../layout/Sidebar";
-import Header from "../layout/Header";
+import Sidebar from "../components/Sidebar";
+import Header from "../components/Header";
 
 function App({ children, title, subtitle }) {
   const [activeMenu, setActiveMenu] = useState();

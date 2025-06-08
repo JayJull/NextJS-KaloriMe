@@ -1,6 +1,6 @@
 "use client"
 import Image from "next/image";
-import LandingTabs from "./LandingTabs/landingtabs";
+import LandingTabs from "../src/components/LandingTabs";
 import { MdRestaurant, MdSearch, MdEco, } from "react-icons/md";
 import { FaArrowUp, FaFacebook, FaInstagram, FaTwitter } from 'react-icons/fa';
 import { useState, useRef, useEffect } from "react";
@@ -8,7 +8,7 @@ import LoginModal from "@/components/LoginModal";
 
 export default function Home() {
 
-   const [showLogin, setShowLogin] = useState(false);
+  const [showLogin, setShowLogin] = useState(false);
   const [activeSection, setActiveSection] = useState("beranda");
 
   const berandaRef = useRef(null);
