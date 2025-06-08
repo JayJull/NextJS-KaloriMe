@@ -6,6 +6,8 @@ import { FaArrowUp, FaFacebook, FaInstagram, FaTwitter } from 'react-icons/fa';
 import { useState, useRef, useEffect } from "react";
 import LoginModal from "@/views/login/LoginModal";
 import RegisterModal from "@/views/register/RegisterModal";
+import LoginModal from "@/views/login/LoginModal";
+import RegisterModal from "@/views/register/RegisterModal";
 import dynamic from 'next/dynamic';
 import { AnimatePresence } from 'framer-motion';
 
@@ -21,6 +23,7 @@ export default function Home() {
   const [showButton, setShowButton] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
+  const DynamicMap = dynamic(() => import('../src/components/MapComponent'), {
   const DynamicMap = dynamic(() => import('../src/components/MapComponent'), {
     ssr: false,
   });
