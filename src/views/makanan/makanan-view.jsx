@@ -13,23 +13,62 @@ export default function MakananView() {
   const [foods, setFoods] = useState([]);
   const [isModalOpen, setIsModalOpen] = useState(false); 
 
-  useEffect(() => {
-    setFoods(makanan);
-  }, []);
-
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
 
-  const handleUpload = (newImage) => {
-    const newFood = {
-      id: Date.now(),
-      nama: "Makanan Baru",
-      kategori: "Lainnya",
-      kalori: 0,
-      foto: URL.createObjectURL(newImage),
-    };
-    setFoods([newFood, ...foods]);
+  const handleUpload = async (imageFile) => {
+  const formData = new FormData();
+  formData.append("image", imageFile);
+
+  try {
+    const response = await fetch("/api/predict-makanan", {
+      method: "POST",
+      body: formData,
+    });
+
+  const result = {
+    nama_makanan: "Rawon" 
   };
+  // const result = await response.json(); 
+    const predictedName = result.nama_makanan; // contoh: "Nasi Goreng"
+
+    if (!predictedName) {
+      alert("Gagal mengenali makanan.");
+      return;
+    }
+
+    // Cari di tabel makanan (data lokal)
+    const found = makanan.find((item) =>
+      item.nama.toLowerCase() === predictedName.toLowerCase()
+    );
+
+    if (!found) {
+      alert(`Makanan "${predictedName}" tidak ditemukan di database.`);
+      return;
+    }
+
+    // Tambahkan ke tabel yang dimakan
+    const newFood = {
+      ...found,
+      id: Date.now(), // Biar unik
+      foto: URL.createObjectURL(imageFile),
+    };
+
+    setFoods([newFood, ...foods]);
+  } catch (error) {
+    console.error("Error saat prediksi:", error);
+    alert("Terjadi kesalahan saat memproses gambar.");
+  }
+};
+
+const handleDelete = (id) => {
+  const confirmed = confirm("Apakah Anda yakin ingin menghapus makanan ini?");
+  if (!confirmed) return;
+
+  const updatedFoods = foods.filter((item) => item.id !== id);
+  setFoods(updatedFoods);
+};
+
 
   return (
     <App>
