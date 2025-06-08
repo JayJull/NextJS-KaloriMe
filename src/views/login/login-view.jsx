@@ -1,15 +1,40 @@
 'use client'
 import Image from "next/image";
-import { FiMail, FiLock, FiArrowRight } from 'react-icons/fi';
+import { FiMail, FiLock, FiArrowRight, FiLoader } from 'react-icons/fi';
 import RegisterModal from "@/components/RegisterModal";
 import LoginModal from "@/components/LoginModal";
 import { useState } from "react";
 import { AnimatePresence } from 'framer-motion';
+import { signIn } from 'next-auth/react';
+import { useRouter } from 'next/navigation';
 
 const LoginView = () => {
   const [showRegister, setShowRegister] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
+  const [email, setEmail] = useState("")
+  const [password, setPassword] = useState("")
+  const [error, setError] = useState(null)
+  const [isLoading, setIsLoading] = useState(false);
 
+  const router = useRouter()
+
+  const handleLogin = async (e) => {
+    e.preventDefault()
+    setIsLoading(true);
+    setError(null);
+    const res = await signIn("credentials", {
+      email,
+      password,
+      redirect: false,
+      callbackUrl: "/dashboard",
+    })
+    setIsLoading(false);
+    if (res?.ok) {
+      router.push('/dashboard')
+    } else {
+      setError('Email atau password salah')
+    }
+  }
 
   return (
     <>
@@ -26,7 +51,7 @@ const LoginView = () => {
           <p className="text-gray-700 text-lg font-semibold">Masuk ke akun Anda</p>
         </div>
 
-        <form className="space-y-6">
+        <form className="space-y-6 " onSubmit={handleLogin}>
           {/* Email */}
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -34,11 +59,12 @@ const LoginView = () => {
             </div>
             <input
               id="email"
-              name="email"
+              value={email}
               type="email"
+              placeholder="Email Anda"
+              onChange={(e) => setEmail(e.target.value)}
               required
               className="w-full text-black font-semibold pl-10 pr-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="Email Anda"
             />
           </div>
 
@@ -49,13 +75,16 @@ const LoginView = () => {
             </div>
             <input
               id="password"
-              name="password"
+              value={password}
               type="password"
+              placeholder="Password Anda"
+              onChange={(e) => setPassword(e.target.value)}
               required
               className="w-full text-black font-semibold pl-10 pr-3 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
-              placeholder="Password Anda"
             />
           </div>
+
+          {error && <p className="text-red-500">{error}</p>}
 
           {/* Remember me + lupa password */}
           <div className="flex items-center justify-between">
@@ -77,10 +106,23 @@ const LoginView = () => {
 
           {/* Tombol masuk */}
           <button
-            type="submit"
-            className="w-full flex justify-center items-center bg-teal-600 text-white font-semibold py-2 px-6 rounded-full shadow-md hover:opacity-80 transition duration-300"
+            type="submit" disabled={isLoading}
+            className={`w-full flex justify-center items-center bg-teal-600 text-white font-semibold py-2 px-6 rounded-full shadow-md hover:opacity-80 transition duration-300
+              ${
+            isLoading
+              ? "bg-teal-400 cursor-not-allowed"
+              : "bg-teal-600 hover:opacity-80 text-white"
+              }`}
           >
-            Masuk <FiArrowRight className="ml-2" />
+          {isLoading ? (
+          <>
+            <FiLoader className="animate-spin mr-2" /> Memproses...
+          </>
+          ) : (
+            <>
+              Masuk <FiArrowRight className="ml-2" />
+            </>
+          )}
           </button>
         </form>
 
@@ -105,10 +147,15 @@ const LoginView = () => {
         {/* Login sosial */}
         <div className="mt-8 pt-6 border-t-2 border-gray-200">
           <div className="flex justify-center space-x-4">
-            <button className="p-2 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors">
+            <button className="p-2 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
+              onClick={() => signIn("google", { callbackUrl: "/dashboard" })}
+            >
               <img src="/icons/google.svg" alt="Google" className="w-5 h-5" />
             </button>
-            <button className="p-2 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors">
+
+            <button className="p-2 rounded-full bg-gray-100 hover:bg-gray-200 transition-colors"
+              onClick={() => signIn("facebook", { callbackUrl: "/dashboard" })}
+            >
               <img src="/icons/facebook.svg" alt="Facebook" className="w-5 h-5" />
             </button>
           </div>

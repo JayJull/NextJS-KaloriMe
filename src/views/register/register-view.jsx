@@ -9,6 +9,49 @@ import { AnimatePresence } from 'framer-motion';
 const RegisterView = () => {
   const [showLogin, setShowLogin] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    password: '',
+    remember: false,
+  });
+
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(false);
+
+    const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value,
+    }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError(null);
+    setSuccess(false);
+
+    try {
+      const res = await axios.post('/api/register', {
+        name: formData.name,
+        email: formData.email,
+        password: formData.password,
+      });
+
+      setSuccess(true);
+      // Kalau mau otomatis close modal & buka login bisa tambahkan:
+      // setShowRegister(false);
+      // setShowLogin(true);
+    } catch (err) {
+      setError(err.response?.data?.message || 'Gagal mendaftar.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
 
   return (
     <>
@@ -24,7 +67,7 @@ const RegisterView = () => {
           <p className="text-gray-700 text-lg font-semibold">Daftar akun baru Anda</p>
         </div>
 
-        <form className="space-y-5">
+        <form className="space-y-5" onSubmit={handleSubmit}>
           {/* Name */}
           <div>
             <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
@@ -38,6 +81,8 @@ const RegisterView = () => {
                 id="name"
                 name="name"
                 type="text"
+                value={formData.name}
+                onChange={handleChange}
                 required
                 className="w-full text-black font-semibold pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 placeholder="Masukkan Nama Anda"
@@ -58,6 +103,8 @@ const RegisterView = () => {
                 id="email"
                 name="email"
                 type="email"
+                value={formData.email}
+                onChange={handleChange}
                 required
                 className="w-full text-black font-semibold pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 placeholder="Masukkan Email Anda"
@@ -78,6 +125,8 @@ const RegisterView = () => {
                 id="password"
                 name="password"
                 type="password"
+                value={formData.password}
+                onChange={handleChange}
                 required
                 className="w-full text-black font-semibold pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
                 placeholder="Masukkan Password"
@@ -89,8 +138,10 @@ const RegisterView = () => {
           <div className="flex items-center">
             <input
               id="remember-me"
-              name="remember-me"
+              name="remember"
               type="checkbox"
+              value={formData.remember}
+              onChange={handleChange}
               className="w-4 h-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500"
             />
             <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900">
@@ -101,10 +152,15 @@ const RegisterView = () => {
           {/* Register Button */}
           <button
             type="submit"
+            disabled={loading}
             className="w-full flex justify-center items-center bg-teal-600 text-white font-semibold py-2 px-6 rounded-full shadow-md hover:opacity-80 transition duration-300"
           >
-            Daftar <FiArrowRight className="ml-2" />
+            {loading ? 'Mendaftar...' : 'Daftar'}
+            {!loading && <FiArrowRight className="ml-2" />}
           </button>
+
+          {error && <p className="text-red-500 text-sm text-center">{error}</p>}
+          {success && <p className="text-green-500 text-sm text-center">Pendaftaran berhasil!</p>}
         </form>
 
         {/* Masuk Link */}
