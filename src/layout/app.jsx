@@ -1,10 +1,12 @@
 'use client'
 import { useState } from 'react'
-import Sidebar from '../layout/Sidebar'
-import Header from '../layout/Header'
+import Sidebar from '../components/Sidebar'
+import Header from '../components/Header'
 
-export default function UploadLayout({ children, title, subtitle }) {
-  const [activeMenu, setActiveMenu] = useState('Upload')
+function App({ children, title, subtitle }) {
+  const [activeMenu, setActiveMenu] = useState();
+
+
 
   return (
     <div className="flex h-screen bg-gray-50">
@@ -18,3 +20,4 @@ export default function UploadLayout({ children, title, subtitle }) {
     </div>
   )
 }
+export default App;

@@ -1,8 +1,9 @@
 'use client'
-import DashboardLayout from '@/components/dashboard/Dashboard'
+
 import StatCard from '@/components/StatCard'
 import ActivityList from '@/components/ActivityList'
 import ProgressChart from '@/components/ProgressChart'
+import App from '@/layout/app'
 
 import { TrendingUp, Target, Calendar, Coffee } from 'lucide-react'
 
@@ -40,7 +41,7 @@ export default function Dashboard() {
   ]
 
   return (
-    <DashboardLayout 
+    <App
       title="Dashboard" 
       
     >
@@ -58,6 +59,6 @@ export default function Dashboard() {
         {/* Recent Activity */}
         <ActivityList />
       </div>
-    </DashboardLayout>
+    </App>
   )
 }
