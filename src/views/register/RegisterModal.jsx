@@ -5,7 +5,7 @@ import { FiX } from 'react-icons/fi';
 
 import RegisterView from './register-view';
 
-const RegisterModal = ({ isOpen, onClose, onSwitchToRegister }) => {
+const RegisterModal = ({ isOpen, onClose, onSwitchToLogin }) => {
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
@@ -27,7 +27,7 @@ const RegisterModal = ({ isOpen, onClose, onSwitchToRegister }) => {
         
         {/* Konten login */}
         <div className="p-8">
-          <RegisterView onSwitchToRegister={onSwitchToRegister} />
+          <RegisterView onClose={onClose} onSwitchToLogin={onSwitchToLogin} />
         </div>
       </div>
     </div>

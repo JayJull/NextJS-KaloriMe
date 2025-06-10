@@ -1,10 +1,8 @@
 'use client'
+import App from '@/layout/app'
 import StatCard from '@/components/StatCard'
 import ActivityList from '@/components/ActivityList'
-import App from '@/layout/app'
-
 import { TrendingUp, Target, Calendar, Coffee } from 'lucide-react'
-import App from '@/layout/app'
 
 export default function Dashboard() {
   const statsData = [
