@@ -40,7 +40,7 @@ Dengan pengembangan aplikasi *KaloriMe* ini bisa dapat dikembangkan di pasar ind
 
 | ID          | Name                      | Institution                      | Role                           | Status |
 |-------------|---------------------------|----------------------------------|--------------------------------|--------|
-| MC319D5Y1574		| Ananda Kelvin Power Situmorang     | Sumatera Utara   | Machine Learning Engineering | Active |
+| MC319D5Y1574		| Ananda Kelvin Power Situmorang     | Universitas Sumatera Utara   | Machine Learning Engineering | Active |
 | MC404D5X0047		| Merri Putri Cristina Sani Panggabean       | Politeknik Negeri Batam | Machine Learning Engineering     | Active |
 | MC189D5X1561		| Evelyn Eunike Aritonang | Universitas Bengkulu | Machine Learning Engineering    | Active |
 | FC525D5Y0007		| Mohamad Joko | Politeknik Negeri Banyuwangi            | Front-End & Back-End               | Active |
