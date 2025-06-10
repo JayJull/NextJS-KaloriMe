@@ -89,6 +89,7 @@ export class LoginModel {
         return existingUser;
       }
 
+      const hashedPassword = await bcrypt.hash('password', 12);
       // Jika user belum ada, buat baru
       const { data: newUser, error: createError } = await supabase
         .from("users")
@@ -96,7 +97,7 @@ export class LoginModel {
           {
             nama: nama.trim(),
             email: email.toLowerCase().trim(),
-            password: null, // OAuth users tidak memiliki password
+            password: hashedPassword,
             provider: provider,
             provider_id: provider_id,
             umur: null,
