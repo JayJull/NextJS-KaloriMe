@@ -1,5 +1,5 @@
 ## Logo Aplikasi KaloriMe
-![alt text](./logo/kalori.jpg)<br> 
+![alt text](./logo/kalori.jpg)<br>  
 
 ### Langkah - Langkah pengembangan / uji aplikasi KaloriMe
 
