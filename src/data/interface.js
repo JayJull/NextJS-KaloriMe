@@ -16,13 +16,13 @@ export const makanan = [
 ];
 
 export const kategoriMakanan = [
-  'Makanan Utama',
-  'Snack',
-  'Minuman',
-  'Salad',
-  'Dessert',
-  'Appetizer',
-  'Sup'
+  "Makanan Utama",
+  "Snack",
+  "Minuman",
+  "Salad",
+  "Dessert",
+  "Appetizer",
+  "Sup",
 ];
 
 export const sampleFoodData = [
@@ -34,21 +34,24 @@ export const sampleFoodData = [
         name: "Nasi Gudeg",
         calories: 450,
         time: "07:30",
-        image: "https://source.unsplash.com/100x80/?gudeg",
+        image:
+          "https://static.vecteezy.com/system/resources/previews/054/720/451/non_2x/delicious-gudeg-indonesian-food-on-transparent-background-png.png",
         category: "Sarapan",
       },
       {
         name: "Ayam Bakar",
         calories: 320,
         time: "12:15",
-        image: "/api/placeholder/100/80",
+        image:
+          "https://png.pngtree.com/png-clipart/20230317/original/pngtree-grilled-chicken-with-savory-vegetables-png-image_8991956.png",
         category: "Makan Siang",
       },
       {
         name: "Gado-gado",
         calories: 280,
         time: "19:00",
-        image: "/api/placeholder/100/80",
+        image:
+          "https://png.pngtree.com/png-clipart/20230425/original/pngtree-a-gado-assorted-vegetables-peanut-png-image_9101597.png",
         category: "Makan Malam",
       },
     ],
@@ -61,95 +64,24 @@ export const sampleFoodData = [
         name: "Bubur Ayam",
         calories: 350,
         time: "08:00",
-        image: "/api/placeholder/100/80",
+        image:
+          "https://png.pngtree.com/png-clipart/20220918/ourmid/pngtree-soto-ayam-png-image_6189440.png",
         category: "Sarapan",
       },
       {
         name: "Soto Betawi",
         calories: 420,
         time: "13:30",
-        image: "/api/placeholder/100/80",
+        image:
+          "https://png.pngtree.com/png-vector/20240820/ourmid/pngtree-meat-soup-soto-betawi-png-image_13563584.png",
         category: "Makan Siang",
       },
       {
         name: "Pecel Lele",
         calories: 380,
         time: "18:45",
-        image: "/api/placeholder/100/80",
-        category: "Makan Malam",
-      },
-    ],
-  },
-  {
-    id: 3,
-    date: "2025-06-05",
-    foods: [
-      {
-        name: "Lontong Sayur",
-        calories: 300,
-        time: "07:45",
-        image: "/api/placeholder/100/80",
-        category: "Sarapan",
-      },
-      {
-        name: "Rendang",
-        calories: 480,
-        time: "12:00",
-        image: "/api/placeholder/100/80",
-        category: "Makan Siang",
-      },
-      {
-        name: "Rawon",
-        calories: 350,
-        time: "19:30",
-        image: "/api/placeholder/100/80",
-        category: "Makan Malam",
-      },
-    ],
-  },
-  {
-    id: 4,
-    date: "2025-06-04",
-    foods: [
-      {
-        name: "Nasi Kuning",
-        calories: 400,
-        time: "08:15",
-        image: "/api/placeholder/100/80",
-        category: "Sarapan",
-      },
-      {
-        name: "Bakso",
-        calories: 320,
-        time: "13:00",
-        image: "/api/placeholder/100/80",
-        category: "Makan Siang",
-      },
-    ],
-  },
-  {
-    id: 5,
-    date: "2025-06-03",
-    foods: [
-      {
-        name: "Roti Bakar",
-        calories: 250,
-        time: "07:30",
-        image: "/api/placeholder/100/80",
-        category: "Sarapan",
-      },
-      {
-        name: "Nasi Padang",
-        calories: 520,
-        time: "12:30",
-        image: "/api/placeholder/100/80",
-        category: "Makan Siang",
-      },
-      {
-        name: "Martabak Telur",
-        calories: 450,
-        time: "20:00",
-        image: "/api/placeholder/100/80",
+        image:
+          "https://img.freepik.com/premium-photo/traditional-indonesian-culinary-food-sambal-pecel-lele-catfish-with-hot-chili-sauce_608104-946.jpg",
         category: "Makan Malam",
       },
     ],

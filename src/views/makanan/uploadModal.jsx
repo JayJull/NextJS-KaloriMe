@@ -1,5 +1,3 @@
-"use client";
-
 import { X, Upload, Image, Camera } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 
