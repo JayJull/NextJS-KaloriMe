@@ -1,31 +1,52 @@
 'use client';
-import { useState } from "react";
-import { useSession } from 'next-auth/react'
-import { User, Mail, Target, Scale, Activity, Calendar, Utensils, Droplets, ArrowLeft } from "lucide-react";
+import { useState, useEffect } from "react";
+import { useSession } from "@/contexts/SessionContext";
+import { User, Target, Scale, Activity, Utensils } from "lucide-react";
 import Image from "next/image";
 import { useRouter } from 'next/navigation'
 import App from "@/layout/app";
 
 export default function Pengaturan() {
-  const [name, setName] = useState("Tama Zidan");
-  const [email, setEmail] = useState("tamazidan87@gmail.com");
-  const [age, setAge] = useState("28");
-  const [weight, setWeight] = useState("70");
-  const [height, setHeight] = useState("175");
-  const [targetWeight, setTargetWeight] = useState("65");
-  const [activityLevel, setActivityLevel] = useState("moderate");
-  const [goal, setGoal] = useState("weight-loss");
+  const [nama, setNama] = useState("");
+  const [umur, setUmur] = useState("");
+  const [berat_badan, setBerat_badan] = useState("");
+  const [tinggi_badan, setTinggi_badan] = useState("");
+  const [tingkat_aktivitas, setTingkat_aktivitas] = useState("");
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
-  const { data: session } = useSession()
-  const router = useRouter()
+  const { user: session } = useSession();
+  const router = useRouter();
+
+  useEffect(() => {
+    console.log("🧠 Session dari context:", session);
+  const fetchProfile = async () => {
+    try {
+      console.log("SESSION:", session);
+      const res = await fetch(`/api/profile/get?email=${session?.user?.email}`);
+      if (!res.ok) throw new Error('Gagal mengambil profil');
+      const data = await res.json();
+      
+      setNama(data.nama || "");
+      setUmur(data.umur?.toString() || "");
+      setBerat_badan(data.berat_badan?.toString() || "");
+      setTinggi_badan(data.tinggi_badan?.toString() || "");
+      setTingkat_aktivitas(data.tingkat_aktivitas || "");
+    } catch (err) {
+      console.error('Fetch error:', err);
+    }
+  };
+
+  if (!loading && session?.user?.email) {
+    fetchProfile();
+  }
+}, [loading, session?.user?.email]);
 
   // Calculate BMI
-  const bmi = weight && height ? (weight / ((height / 100) ** 2)).toFixed(1) : 0;
+  const bmi = berat_badan && tinggi_badan ? (berat_badan / ((tinggi_badan / 100) ** 2)).toFixed(1) : 0;
   
   // Calculate daily calorie target (simplified Harris-Benedict formula)
-  const bmr = weight && height && age ? 
-    (10 * parseFloat(weight) + 6.25 * parseFloat(height) - 5 * parseFloat(age) + 5) : 0;
+  const bmr = berat_badan && tinggi_badan && umur ? 
+    (10 * parseFloat(berat_badan) + 6.25 * parseFloat(tinggi_badan) - 5 * parseFloat(umur) + 5) : 0;
   
   const activityMultipliers = {
     sedentary: 1.2,
@@ -35,34 +56,52 @@ export default function Pengaturan() {
     very_active: 1.9
   };
   
-  const dailyCalories = Math.round(bmr * activityMultipliers[activityLevel]);
+  const dailyCalories = Math.round(
+  activityMultipliers[tingkat_aktivitas]
+    ? bmr * activityMultipliers[tingkat_aktivitas]
+    : 0
+);
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setSuccess(false);
-
+console.log("🧾 Data yang dikirim ke /api/profile:", {
+  nama,
+  email: session?.user?.email,
+  umur,
+  berat_badan,
+  tinggi_badan,
+  tingkat_aktivitas,
+});
     try {
-      const res = await fetch('/api/profile/update', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ 
-          name, email, age, weight, height, targetWeight, activityLevel, goal 
-        }),
-      });
+    const res = await fetch('/api/profile', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        nama: nama.trim(),
+        email: session?.user?.email,
+        umur: umur ? parseInt(umur) : null,
+        berat_badan: berat_badan ? parseFloat(berat_badan) : null,
+        tinggi_badan: tinggi_badan ? parseFloat(tinggi_badan) : null,
+        tingkat_aktivitas: tingkat_aktivitas || null,
+      }),
+    });
 
-      if (!res.ok) throw new Error('Gagal simpan');
+    if (!res.ok) throw new Error('Gagal simpan');
 
-      setSuccess(true);
-      setTimeout(() => setSuccess(false), 3000);
-    } catch (err) {
-      alert('Terjadi kesalahan saat menyimpan profil');
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
+    setSuccess(true);
+    setTimeout(() => setSuccess(false), 3000);
+  } catch (err) {
+    alert('Terjadi kesalahan saat menyimpan profil');
+    console.error(err);
+  } finally {
+    setLoading(false);
+  }
+
   };
 
   const avatarLarge = session?.user?.image ? (
@@ -75,8 +114,8 @@ export default function Pengaturan() {
         />
       </div>
     ) : (
-      <span className="bg-blue-500 text-white font-bold w-15 h-15 sm:w-25 lg:w-30 sm:h-25 lg:h-30 rounded-full flex items-center justify-center text-2xl">
-        {(session?.user?.name || "Guest").charAt(0)}
+      <span className="bg-blue-500 text-white font-bold w-15 h-15 sm:w-25 lg:w-30 sm:h-25 lg:h-30 rounded-full flex items-center justify-center text-6xl">
+        {(session?.nama || "Guest").charAt(0)}
       </span>
     )
 
@@ -90,36 +129,30 @@ export default function Pengaturan() {
             <div className="rounded-full mx-auto flex items-center justify-center text-white text-2xl font-bold mb-4">
                   {avatarLarge}
                 </div>
-            <h1 className="text-2xl font-bold text-gray-900">{name}</h1>
-            <p className="text-gray-600">{email}</p>
+            <h1 className="text-2xl font-bold text-gray-900">{session?.nama || "Guest"}</h1>
+            <p className="text-gray-600">{session?.email || "guest@example.com"}</p>
           </div>
         </div>
       </div>
 
       <div className="max-w-2xl mx-auto px-4 py-8">
         {/* Health Stats Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
           <div className="bg-white rounded-lg p-4 text-center shadow-sm">
             <Scale className="w-6 h-6 text-green-600 mx-auto mb-2" />
-            <div className="text-2xl font-bold text-gray-900">{weight}</div>
+            <div className="text-2xl font-bold text-gray-900">{berat_badan || "-"}</div>
             <div className="text-sm text-gray-600">kg</div>
           </div>
           
           <div className="bg-white rounded-lg p-4 text-center shadow-sm">
             <Activity className="w-6 h-6 text-blue-600 mx-auto mb-2" />
-            <div className="text-2xl font-bold text-gray-900">{bmi}</div>
+            <div className="text-2xl font-bold text-gray-900">{bmi || "-"}</div>
             <div className="text-sm text-gray-600">BMI</div>
           </div>
           
           <div className="bg-white rounded-lg p-4 text-center shadow-sm">
-            <Target className="w-6 h-6 text-orange-600 mx-auto mb-2" />
-            <div className="text-2xl font-bold text-gray-900">{targetWeight}</div>
-            <div className="text-sm text-gray-600">Target kg</div>
-          </div>
-          
-          <div className="bg-white rounded-lg p-4 text-center shadow-sm">
             <Utensils className="w-6 h-6 text-purple-600 mx-auto mb-2" />
-            <div className="text-2xl font-bold text-gray-900">{dailyCalories}</div>
+            <div className="text-2xl font-bold text-gray-900">{dailyCalories || "-"}</div>
             <div className="text-sm text-gray-600">kcal/hari</div>
           </div>
         </div>
@@ -138,20 +171,9 @@ export default function Pengaturan() {
                 <label className="block text-sm font-medium text-gray-700 mb-2">Nama</label>
                 <input
                   className="w-full border border-gray-300 text-black rounded-lg px-3 py-2 focus:ring-2 focus:ring-teal-600 focus:border-transparent"
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
                   type="text"
-                  required
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
-                <input
-                  className="w-full border border-gray-300 text-black rounded-lg px-3 py-2 focus:ring-2 focus:ring-teal-600 focus:border-transparent"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  type="email"
+                  value={nama}
+                  onChange={(e) => setNama(e.target.value)}
                   required
                 />
               </div>
@@ -169,8 +191,8 @@ export default function Pengaturan() {
                   <label className="block text-sm font-medium text-gray-700 mb-2">Umur</label>
                   <input
                     className="w-full border border-gray-300 text-black rounded-lg px-3 py-2 focus:ring-2 focus:ring-teal-600 focus:border-transparent"
-                    value={age}
-                    onChange={(e) => setAge(e.target.value)}
+                    value={umur}
+                    onChange={(e) => setUmur(e.target.value)}
                     type="number"
                     placeholder="tahun"
                   />
@@ -180,8 +202,8 @@ export default function Pengaturan() {
                   <label className="block text-sm font-medium text-gray-700 mb-2">Berat Badan</label>
                   <input
                     className="w-full border border-gray-300 text-black rounded-lg px-3 py-2 focus:ring-2 focus:ring-teal-600 focus:border-transparent"
-                    value={weight}
-                    onChange={(e) => setWeight(e.target.value)}
+                    value={berat_badan}
+                    onChange={(e) => setBerat_badan(e.target.value)}
                     type="number"
                     placeholder="kg"
                   />
@@ -191,8 +213,8 @@ export default function Pengaturan() {
                   <label className="block text-sm font-medium text-gray-700 mb-2">Tinggi Badan</label>
                   <input
                     className="w-full border border-gray-300 text-black rounded-lg px-3 py-2 focus:ring-2 focus:ring-teal-600 focus:border-transparent"
-                    value={height}
-                    onChange={(e) => setHeight(e.target.value)}
+                    value={tinggi_badan}
+                    onChange={(e) => setTinggi_badan(e.target.value)}
                     type="number"
                     placeholder="cm"
                   />
@@ -220,8 +242,8 @@ export default function Pengaturan() {
                       type="radio"
                       name="activity"
                       value={option.value}
-                      checked={activityLevel === option.value}
-                      onChange={(e) => setActivityLevel(e.target.value)}
+                      checked={tingkat_aktivitas === option.value}
+                      onChange={(e) => setTingkat_aktivitas(e.target.value)}
                       className="text-green-600 focus:ring-green-500"
                     />
                     <div className="ml-3">

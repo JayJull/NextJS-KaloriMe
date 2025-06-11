@@ -6,9 +6,9 @@ import { format } from 'date-fns'
 import { id } from 'date-fns/locale'
 import 'react-datepicker/dist/react-datepicker.css'
 import Image from 'next/image'
-import { useSession } from "next-auth/react"
+import { useSession } from '@/contexts/SessionContext'
 import { useRouter } from 'next/navigation'
-import { signOut } from 'next-auth/react'
+import React from 'react';
 
 export default function Header({ title, subtitle }) {
   const [searchQuery, setSearchQuery] = useState('')
@@ -17,7 +17,7 @@ export default function Header({ title, subtitle }) {
   const [open, setOpen] = useState(false)
   const [showMobileSearch, setShowMobileSearch] = useState(false)
   const [showMobileMenu, setShowMobileMenu] = useState(false)
-  const { data: session } = useSession()
+  const { user: session } = useSession()
   const dropdownRef = useRef(null)
   const router = useRouter()
 
@@ -57,7 +57,7 @@ const avatarSmall = session?.user?.image ? (
     </div>
   ) : (
     <span className="bg-blue-500 text-white font-bold w-10 sm:w-9 lg:w-10 h-10 sm:h-9 lg:h-10 rounded-full flex items-center justify-center text-base sm:text-xl lg:text-2xl">
-      {(session?.user?.name || "Guest").charAt(0)}
+      {(session?.nama || "Guest").charAt(0)}
     </span>
   )
 
@@ -72,13 +72,30 @@ const avatarSmall = session?.user?.image ? (
     </div>
   ) : (
     <span className="bg-blue-500 text-white font-bold w-20 sm:w-15 lg:w-20 h-20 sm:h-15 lg:h-20 rounded-full flex items-center justify-center text-2xl">
-      {(session?.user?.name || "Guest").charAt(0)}
+      {(session?.nama || "Guest").charAt(0)}
     </span>
   )
 
   const user = {
-    name: session?.user?.name || "Guest",
-    email: session?.user?.email || "guest@example.com",
+    name: session?.nama || "Guest",
+    email: session?.email || "guest@example.com",
+  }
+
+ async function logout() {
+    try {
+      const res = await fetch('/api/logout', {
+        method: 'POST',
+        credentials: 'include',   // PENTING! agar cookie dikirim
+      });
+      if (res.ok) {
+        router.push('/');
+      } else {
+        const data = await res.json();
+        console.error('Logout failed:', data);
+      }
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
   }
 
   return (
@@ -284,7 +301,7 @@ const avatarSmall = session?.user?.image ? (
 
                     {/* Edit Profile Button */}
                     <button
-                        onClick={() => signOut({callbackUrl: '/'})}
+                        onClick={logout}
                         className="mt-5 w-full border border-red-600 rounded-full flex items-center justify-center px-3 py-2 text-red-600 hover:bg-red-100 rounded-lg"
                     >
                         <LogOut size={20} />

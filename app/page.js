@@ -31,6 +31,12 @@ export default function Home() {
   };
 
   useEffect(() => {
+    const cookies = document.cookie;
+    const isLoggedIn = cookies.includes('session_id');
+    if (!isLoggedIn) {
+      setShowLogin(false);
+    }
+
     const handleScroll = () => {
       setShowButton(window.scrollY > 300);
 

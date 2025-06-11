@@ -1,6 +1,6 @@
 import { Quicksand } from "next/font/google";
 import "./globals.css";
-import SessionWrapper from "@/components/SessionWrapper";
+import { SessionProvider } from '@/contexts/SessionContext'
 
 const quicksand = Quicksand({
   subsets: ['latin'],
@@ -15,12 +15,12 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en" className={quicksand.variable}>
-      <body className={quicksand.className}>
-        <SessionWrapper>
+    <html lang="id">
+      <body>
+        <SessionProvider>
           {children}
-        </SessionWrapper>
+        </SessionProvider>
       </body>
     </html>
-  );
+  )
 }
