@@ -1,7 +1,7 @@
 # **KaloriMe - Capstone Project Coding Camp CC25-CF192**
 ## Latar Belakang 
 Aplikasi KaloriMe dirancang untuk membantu pengguna (wanita) mengelola asupan kalori harian secara efektif. Dengan membuat fitur pencatatan makanan, perhitungan kalori otomatis dan warning/ notifikasi batas kalori harian, Aplikasi KaloriMe bertujuan untuk meningkatkan kesadaran wanita dalam pentingnya pola makan sehat dan gaya hidup sehat. Proyek ini dibuat dengan mengintegrasikan machine learning didalamnya, yang bertujuan untuk memprediksi gambar makanan secara akurat dan memprediksi jumlah kalori tiap gambar yang di upload, serta dalam pengembangan front-end dan back-end memberikan pengalaman kepada pengguna untuk membuat aplikasi yang user-friendly. Tujuan kami menciptakan aplikasi KaloriMe ini supaya memberikan dampak positif dan perubahan signifikan terhadap wanita dalam mencapai dan mempertahankan berat badan ideal dan nutrisi yang seimbang.<br>
-![alt text](./logo/kalori.jpg)<br> 
+![alt text](./logo/kalori.jpg)<br>  
 
 ## Alasan & Motivasi
 Indonesia seringkali kita temui setiap individu dewasa **(wanita)** yang kesusahan dalam mengontrol dan mencatat kalori makanan yang telah dikomsumsi setiap harinya.<br>
