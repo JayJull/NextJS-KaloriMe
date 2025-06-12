@@ -268,19 +268,6 @@ const LoginView = ({ onSwitchToRegister }) => {
               />
               Google
             </button>
-
-            <button
-              type="button"
-              className="w-full inline-flex justify-center items-center px-4 py-3 border border-gray-300 rounded-lg bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors duration-200"
-              onClick={() => handleSocialLogin("facebook")}
-            >
-              <img
-                src="/icons/facebook.svg"
-                alt="Facebook"
-                className="w-5 h-5 mr-2"
-              />
-              Facebook
-            </button>
           </div>
         </div>
       </div>
