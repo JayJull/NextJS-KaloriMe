@@ -58,6 +58,12 @@ const LoginView = ({ onSwitchToRegister }) => {
       });
 
       if (res?.ok) {
+        const response = await fetch("/api/session-user");
+        const data = await response.json();
+
+        if (data?.user?.id) {
+          localStorage.setItem("userId", data.user.id);
+        }
         router.push("/dashboard");
       } else {
         setError("Email atau password salah. Silakan periksa kembali.");
