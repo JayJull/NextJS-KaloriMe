@@ -1,9 +1,8 @@
 'use client'
+import App from '@/layout/app'
 import StatCard from '@/components/StatCard'
 import ActivityList from '@/components/ActivityList'
-
 import { TrendingUp, Target, Calendar, Coffee } from 'lucide-react'
-import App from '@/layout/app'
 
 export default function Dashboard() {
   const statsData = [
@@ -49,8 +48,6 @@ export default function Dashboard() {
             <StatCard key={index} {...stat} />
           ))}
         </div>
-
-        {/* Recent Activity */}
         <ActivityList />
       </div>
     </App>

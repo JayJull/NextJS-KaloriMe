@@ -1,23 +1,57 @@
-import { NextResponse } from 'next/server'
-import { createUser } from '@/models/userModel'
-import bcrypt from 'bcryptjs'
+import { RegisterPresenter } from '@/presenters/RegisterPresenter';
 
-export async function POST(req) {
+export async function POST(request) {
   try {
-    const body = await req.json()
-    const { nama, email, password } = body
+    // Parse request body
+    const body = await request.json();
+    const { name, email, password } = body;
 
-    if (!nama || !email || !password) {
-      return NextResponse.json({ message: 'Semua field wajib diisi' }, { status: 400 })
+    // Validasi basic request
+    if (!name || !email || !password) {
+      return Response.json(
+        RegisterPresenter.formatApiResponse({
+          success: false,
+          message: 'Semua field harus diisi',
+          errors: {
+            name: !name ? 'Nama harus diisi' : null,
+            email: !email ? 'Email harus diisi' : null,
+            password: !password ? 'Password harus diisi' : null,
+          }
+        }),
+        { status: 400 }
+      );
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10)
-    const userId = await createUser({ nama, email, password: hashedPassword })
+    // Process registration melalui presenter
+    const result = await RegisterPresenter.handleRegister({
+      name,
+      email,
+      password
+    });
 
-    return NextResponse.json({ userId }, { status: 201 })
+    // Return response based on result
+    if (result.success) {
+      return Response.json(
+        RegisterPresenter.formatApiResponse(result),
+        { status: 201 }
+      );
+    } else {
+      return Response.json(
+        RegisterPresenter.formatApiResponse(result),
+        { status: 400 }
+      );
+    }
+
   } catch (error) {
-    console.error('ERROR REGISTER:', error)
-    return NextResponse.json({ message: 'Internal Server Error' }, { status: 500 })
+    console.error('Register API Error:', error);
+    
+    return Response.json(
+      RegisterPresenter.formatApiResponse({
+        success: false,
+        message: 'Internal server error',
+        errors: {}
+      }),
+      { status: 500 }
+    );
   }
 }
-

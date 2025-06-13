@@ -1,35 +1,118 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Plus, Edit2, Trash2, Save, X, Upload, Image } from "lucide-react";
+import {
+  Plus,
+  Edit2,
+  Trash2,
+  Save,
+  X,
+  Upload,
+  Image,
+  RefreshCw,
+} from "lucide-react";
 import { makanan, kategoriMakanan } from "@/data/interface";
 import App from "@/layout/app";
 import UploadModal from "@/views/makanan/uploadModal";
-
 
 export default function MakananView() {
   const title = "Makanan";
 
   const [foods, setFoods] = useState([]);
-  const [isModalOpen, setIsModalOpen] = useState(false); 
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    setFoods(makanan);
+    loadFoods();
   }, []);
+
+  const loadFoods = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const userId = localStorage.getItem("userId");
+      if (!userId) {
+        setError("User ID tidak ditemukan. Silakan login kembali.");
+        return;
+      }
+
+      const response = await fetch(
+        `/api/food/upload?userId=${userId}&type=foods`
+      );
+      const result = await response.json();
+
+      if (result.success) {
+        setFoods(result.data);
+      } else {
+        setError(result.message);
+      }
+    } catch (err) {
+      console.error("Error loading foods:", err);
+      setError("Gagal memuat data makanan");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
 
-  const handleUpload = (newImage) => {
-    const newFood = {
-      id: Date.now(),
-      nama: "Makanan Baru",
-      kategori: "Lainnya",
-      kalori: 0,
-      foto: URL.createObjectURL(newImage),
-    };
-    setFoods([newFood, ...foods]);
+  const handleUpload = async (newImage) => {
+    // Refresh data setelah upload berhasil
+    await loadFoods();
+    closeModal();
   };
+
+  const handleDelete = async (foodId) => {
+    if (!confirm("Apakah Anda yakin ingin menghapus makanan ini?")) {
+      return;
+    }
+
+    try {
+      const userId = localStorage.getItem("userId");
+      const response = await fetch(
+        `/api/food/upload?id=${foodId}&userId=${userId}`,
+        {
+          method: "DELETE",
+        }
+      );
+
+      const result = await response.json();
+
+      if (result.success) {
+        alert("Makanan berhasil dihapus");
+        await loadFoods(); // Refresh data
+      } else {
+        alert(result.message);
+      }
+    } catch (error) {
+      console.error("Error deleting food:", error);
+      alert("Gagal menghapus makanan");
+    }
+  };
+
+  const handleRefresh = () => {
+    loadFoods();
+  };
+
+  if (loading) {
+    return (
+      <App>
+        <div className="min-h-screen bg-gradient-to-br from-teal-50 to-red-50 p-6">
+          <div className="max-w-7xl mx-auto">
+            <div className="flex items-center justify-center h-64">
+              <div className="flex items-center gap-3">
+                <RefreshCw className="animate-spin" size={24} />
+                <span className="text-lg">Memuat data makanan...</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </App>
+    );
+  }
 
   return (
     <App>
@@ -43,14 +126,32 @@ export default function MakananView() {
                 <p className="text-gray-600 mt-2">
                   Kelola makanan dan kalori Anda
                 </p>
+                {error && (
+                  <div className="mt-2 p-2 bg-red-100 text-red-700 rounded-md text-sm">
+                    {error}
+                  </div>
+                )}
               </div>
-              <button
-                onClick={() => openModal()}
-                className="bg-teal-500 hover:bg-teal-600 text-white px-6 py-3 rounded-lg flex items-center gap-2 transition-colors shadow-md"
-              >
-                <Plus size={20} />
-                Tambah Makanan{" "}
-              </button>
+              <div className="flex gap-3">
+                <button
+                  onClick={handleRefresh}
+                  className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-3 rounded-lg flex items-center gap-2 transition-colors shadow-md"
+                  disabled={loading}
+                >
+                  <RefreshCw
+                    size={20}
+                    className={loading ? "animate-spin" : ""}
+                  />
+                  Refresh
+                </button>
+                <button
+                  onClick={openModal}
+                  className="bg-teal-500 hover:bg-teal-600 text-white px-6 py-3 rounded-lg flex items-center gap-2 transition-colors shadow-md"
+                >
+                  <Plus size={20} />
+                  Tambah Makanan
+                </button>
+              </div>
             </div>
           </div>
 
@@ -70,6 +171,10 @@ export default function MakananView() {
                     <th className="px-6 py-4 text-left font-semibold">
                       Kalori
                     </th>
+                    <th className="px-6 py-4 text-left font-semibold">
+                      Tanggal
+                    </th>
+                    <th className="px-6 py-4 text-left font-semibold">Waktu</th>
                     <th className="px-6 py-4 text-center font-semibold">
                       Aksi
                     </th>
@@ -110,6 +215,16 @@ export default function MakananView() {
                         </span>
                       </td>
                       <td className="px-6 py-4">
+                        <span className="text-sm text-gray-600">
+                          {food.tanggal_formatted}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className="text-sm text-gray-600">
+                          {food.waktu}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4">
                         <div className="flex justify-center gap-2">
                           <button
                             onClick={() => handleDelete(food.id)}
@@ -125,10 +240,13 @@ export default function MakananView() {
                 </tbody>
               </table>
 
-              {foods.length === 0 && (
+              {foods.length === 0 && !loading && (
                 <div className="text-center py-12">
                   <p className="text-gray-500 text-lg">
                     Belum ada data makanan
+                  </p>
+                  <p className="text-gray-400 text-sm mt-2">
+                    Klik "Tambah Makanan" untuk menambah data
                   </p>
                 </div>
               )}
@@ -136,11 +254,12 @@ export default function MakananView() {
           </div>
         </div>
       </div>
+
       <UploadModal
-  isOpen={isModalOpen}
-  onClose={closeModal}
-  onUpload={handleUpload}
-/>
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        onUpload={handleUpload}
+      />
     </App>
   );
 }
