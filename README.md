@@ -18,7 +18,7 @@ Pada pengembangan aplikasi *KaloriMe* ini, tujuan utama dari proyek ini adalah u
 ## Learning Path 
 ### Machine Learning
 - Tools: Google Colab, Huggingface Space, Visual Studio Code
-- Framework: Tensorflow, Keras, Flask
+- Library: Tensorflow, Keras, Numpy, Scikit-Learn, Matplotlib.
 - Bahasa Pemrograman: Python 
 
 ### Front-End & Back-End
