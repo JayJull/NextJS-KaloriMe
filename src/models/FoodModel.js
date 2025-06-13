@@ -80,7 +80,7 @@ export class FoodService {
   static async getTodayHasBeenEaten(userId) {
     try {
       const today = new Date().toISOString().split("T")[0];
-      
+
       const { data, error } = await supabase
         .from("has_been_eaten")
         .select("*")
@@ -114,27 +114,39 @@ export class FoodService {
   }
 
   // Delete old has_been_eaten records (called by cron job)
-  // Hapus data yang sudah lebih dari 1 hari dari jam 23:00 WIB
+  // Hapus data yang sudah lebih dari 1 hari (24 jam) dari sekarang
   static async deleteOldRecords() {
     try {
-      // Buat timestamp untuk 23:00 WIB kemarin
+      // Buat cutoff time: 24 jam yang lalu dari sekarang
       const now = new Date();
-      const yesterday = new Date(now);
-      yesterday.setDate(yesterday.getDate() - 1);
-      yesterday.setHours(23, 0, 0, 0);
+      const cutoffTime = new Date(now.getTime() - 24 * 60 * 60 * 1000); // 24 jam yang lalu
 
-      // Convert ke UTC (WIB = UTC + 7)
-      const cutoffTime = new Date(yesterday.getTime() - (7 * 60 * 60 * 1000));
+      console.log(`Deleting records older than: ${cutoffTime.toISOString()}`);
+      console.log(`Current time: ${now.toISOString()}`);
+
+      const cutoffDate = cutoffTime.toISOString().split("T")[0];
 
       const { data, error } = await supabase
         .from("has_been_eaten")
         .delete()
-        .lt("created_at", cutoffTime.toISOString());
+        .lte("tanggal", cutoffDate)
+        .select();
 
-      if (error) throw error;
-      
-      console.log(`Deleted old records before: ${cutoffTime.toISOString()}`);
-      return { success: true, deletedCount: data?.length || 0 };
+      if (error) {
+        console.error("Error in delete query:", error);
+        throw error;
+      }
+
+      const deletedCount = data ? data.length : 0;
+      console.log(`Successfully deleted ${deletedCount} old records`);
+      console.log(`Cutoff date used: ${cutoffDate}`);
+
+      return {
+        success: true,
+        deletedCount: deletedCount,
+        cutoffDate: cutoffDate,
+        timestamp: now.toISOString(),
+      };
     } catch (error) {
       console.error("Error deleting old records:", error);
       throw error;

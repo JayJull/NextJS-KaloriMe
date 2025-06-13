@@ -1,4 +1,4 @@
-// uploadModal.jsx - Updated version
+// uploadModal.jsx - Updated version with confirmation dialog for found foods
 import { X, Upload, Image, Camera } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 
@@ -7,6 +7,9 @@ export default function UploadModal({ isOpen, onClose, onUpload }) {
   const [imagePreview, setImagePreview] = useState("");
   const [isUploading, setIsUploading] = useState(false);
   const [showComingSoon, setShowComingSoon] = useState(false);
+  const [showConfirmation, setShowConfirmation] = useState(false);
+  const [confirmationData, setConfirmationData] = useState(null);
+  const [predictionInfo, setPredictionInfo] = useState(null);
   const [cameraError, setCameraError] = useState(null);
   const videoRef = useRef(null);
   const canvasRef = useRef(null);
@@ -51,7 +54,8 @@ export default function UploadModal({ isOpen, onClose, onUpload }) {
     if (showComingSoon) {
       const timer = setTimeout(() => {
         setShowComingSoon(false);
-      }, 3000);
+        setPredictionInfo(null);
+      }, 5000); // Diperpanjang untuk membaca info
       return () => clearTimeout(timer);
     }
   }, [showComingSoon]);
@@ -63,6 +67,9 @@ export default function UploadModal({ isOpen, onClose, onUpload }) {
       setImagePreview("");
       setIsUploading(false);
       setShowComingSoon(false);
+      setShowConfirmation(false);
+      setConfirmationData(null);
+      setPredictionInfo(null);
       setCameraError(null);
     }
   }, [isOpen]);
@@ -97,7 +104,7 @@ export default function UploadModal({ isOpen, onClose, onUpload }) {
       fetch(dataUrl)
         .then((res) => res.arrayBuffer())
         .then((buffer) => {
-          const file = new File([buffer], "gado-gado.png", {
+          const file = new File([buffer], `capture-${Date.now()}.png`, {
             type: "image/png",
           });
           setSelectedImage(file);
@@ -134,18 +141,26 @@ export default function UploadModal({ isOpen, onClose, onUpload }) {
       const result = await response.json();
 
       if (result.success) {
-        // Sukses - panggil callback parent
-        if (onUpload) {
-          onUpload(selectedImage);
+        if (result.requiresConfirmation) {
+          // Tampilkan dialog konfirmasi
+          setConfirmationData(result.data);
+          setPredictionInfo(result.predictionInfo);
+          setShowConfirmation(true);
+        } else {
+          // Sukses langsung - panggil callback parent
+          if (onUpload) {
+            onUpload(selectedImage);
+          }
+          setSelectedImage(null);
+          setImagePreview("");
+          onClose();
         }
-        setSelectedImage(null);
-        setImagePreview("");
-        onClose();
-        alert(result.message);
       } else {
         if (result.showPopup) {
-          // Tampilkan Coming Soon popup
+          // Simpan info prediksi untuk ditampilkan di popup coming soon
+          setPredictionInfo(result.predictionInfo);
           setShowComingSoon(true);
+          console.log("Prediction info:", result.predictionInfo);
         } else {
           alert(result.message);
         }
@@ -156,6 +171,51 @@ export default function UploadModal({ isOpen, onClose, onUpload }) {
     } finally {
       setIsUploading(false);
     }
+  };
+
+  const handleConfirmYes = async () => {
+    try {
+      setIsUploading(true);
+
+      const response = await fetch("/api/food/confirm", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          confirmationData: confirmationData,
+        }),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        // Sukses - panggil callback parent
+        if (onUpload) {
+          onUpload(selectedImage);
+        }
+        setSelectedImage(null);
+        setImagePreview("");
+        setShowConfirmation(false);
+        setConfirmationData(null);
+        setPredictionInfo(null);
+        onClose();
+        alert(result.message);
+      } else {
+        alert(result.message);
+      }
+    } catch (error) {
+      console.error("Confirm error:", error);
+      alert("Terjadi kesalahan saat menyimpan data");
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  const handleConfirmNo = () => {
+    setShowConfirmation(false);
+    setConfirmationData(null);
+    setPredictionInfo(null);
   };
 
   const handleClose = () => {
@@ -260,7 +320,9 @@ export default function UploadModal({ isOpen, onClose, onUpload }) {
               {isUploading ? (
                 <>
                   <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
-                  Uploading...
+                  {predictionInfo?.method === "api_prediction"
+                    ? "Predicting..."
+                    : "Uploading..."}
                 </>
               ) : (
                 <>
@@ -276,21 +338,137 @@ export default function UploadModal({ isOpen, onClose, onUpload }) {
         </div>
       </div>
 
-      {/* Coming Soon Popup */}
+      {/* Confirmation Dialog untuk makanan yang ditemukan */}
+      {showConfirmation && confirmationData && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[60]">
+          <div className="bg-white rounded-xl shadow-lg p-6 text-center max-w-md mx-4">
+            <div className="text-4xl mb-4">🍽️</div>
+            <h3 className="text-xl font-bold text-gray-800 mb-3">
+              Makanan Terdeteksi!
+            </h3>
+
+            <div className="mb-4 p-4 bg-teal-50 rounded-lg">
+              <p className="text-gray-700 mb-2">
+                AI mendeteksi makanan:{" "}
+                <span className="font-bold text-teal-700">
+                  "{confirmationData.matchedFood.nama}"
+                </span>
+              </p>
+
+              <div className="grid grid-cols-2 gap-2 mt-3 text-sm">
+                <div className="bg-white p-2 rounded">
+                  <span className="text-gray-600">Kategori:</span>
+                  <div className="font-semibold text-teal-600">
+                    {confirmationData.matchedFood.kategori}
+                  </div>
+                </div>
+                <div className="bg-white p-2 rounded">
+                  <span className="text-gray-600">Kalori:</span>
+                  <div className="font-semibold text-orange-600">
+                    {confirmationData.matchedFood.kalori} kal
+                  </div>
+                </div>
+              </div>
+
+              {predictionInfo?.confidence && (
+                <p className="text-xs text-gray-500 mt-2">
+                  Confidence: {(predictionInfo.confidence * 100).toFixed(1)}%
+                </p>
+              )}
+            </div>
+
+            <p className="text-gray-600 mb-6">
+              Apakah Anda ingin menambahkan makanan ini ke dalam catatan
+              konsumsi Anda?
+            </p>
+
+            <div className="flex gap-3">
+              <button
+                onClick={handleConfirmNo}
+                disabled={isUploading}
+                className="flex-1 border-2 border-gray-300 text-gray-700 py-2 px-4 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                Tidak
+              </button>
+              <button
+                onClick={handleConfirmYes}
+                disabled={isUploading}
+                className="flex-1 bg-teal-500 text-white py-2 px-4 rounded-md hover:bg-teal-600 disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center justify-center gap-2 transition-colors"
+              >
+                {isUploading ? (
+                  <>
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                    Menyimpan...
+                  </>
+                ) : (
+                  "Ya, Tambahkan"
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Enhanced Coming Soon Popup with Prediction Info (untuk makanan tidak ditemukan) */}
       {showComingSoon && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-[60]">
-          <div className="bg-white rounded-xl shadow-lg p-8 text-center max-w-sm mx-4">
-            <div className="text-4xl mb-4">🚀</div>
+          <div className="bg-white rounded-xl shadow-lg p-6 text-center max-w-sm mx-4">
+            <div className="text-4xl mb-4">🤖</div>
             <h3 className="text-xl font-bold text-gray-800 mb-2">
-              Coming Soon
+              AI Prediction Result
             </h3>
-            <p className="text-gray-600 mb-2">
-              Makanan ini akan segera tersedia!
-            </p>
+
+            {predictionInfo?.success && predictionInfo?.predicted_class ? (
+              <div className="mb-4">
+                <p className="text-gray-600 mb-2">
+                  AI mendeteksi:{" "}
+                  <span className="font-semibold text-teal-600">
+                    "{predictionInfo.predicted_class}"
+                  </span>
+                </p>
+                {predictionInfo.confidence && (
+                  <p className="text-sm text-gray-500 mb-2">
+                    Confidence: {(predictionInfo.confidence * 100).toFixed(1)}%
+                  </p>
+                )}
+                <p className="text-sm text-gray-600">
+                  Namun makanan ini belum tersedia dalam database kami.
+                </p>
+              </div>
+            ) : (
+              <div className="mb-4">
+                <p className="text-gray-600 mb-2">
+                  Gagal memprediksi makanan dari gambar
+                </p>
+                {predictionInfo?.error && (
+                  <p className="text-xs text-red-500 mb-2">
+                    Error: {predictionInfo.error}
+                  </p>
+                )}
+                <p className="text-sm text-gray-600">
+                  Coba dengan gambar yang lebih jelas atau nama file yang
+                  sesuai.
+                </p>
+              </div>
+            )}
+
+            <div className="text-2xl mb-2">🚀</div>
+            <h4 className="text-lg font-semibold text-gray-800 mb-2">
+              Coming Soon
+            </h4>
             <p className="text-sm text-gray-500">
-              Coba dengan nama makanan yang lain atau pastikan nama file sesuai
-              dengan makanan yang ada.
+              Makanan baru akan segera ditambahkan ke database!
             </p>
+
+            <button
+              onClick={() => {
+                setShowComingSoon(false);
+                setPredictionInfo(null);
+              }}
+              className="mt-4 bg-teal-500 text-white px-4 py-2 rounded-md text-sm hover:bg-teal-600 transition-colors"
+            >
+              Mengerti
+            </button>
           </div>
         </div>
       )}
