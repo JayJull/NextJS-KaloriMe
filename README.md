@@ -34,16 +34,16 @@ Pada pengimplementasian proyek ini melibatkan pengembangan sistem dengan mengupl
 
 ## Cara Menjalankan Aplikasi KaloriMe - 
 1. Clone Repository<br>
-Git Clone https://github.com/JayJull/NextJS-KaloriMe.git
-cd NextJS-KaloriMe
+- Git Clone https://github.com/JayJull/NextJS-KaloriMe.git
+- cd NextJS-KaloriMe
 
 2. Menjalankan di CMD/Terminal
-npm install
-npm run dev
+- npm install
+- npm run dev
 
 3. Menjalankan di browser
-Port : http://192.168.56.1:3000
-Jalankan di browser.  
+- Port : http://192.168.56.1:3000
+- Jalankan di browser.  
 
 ### Target Pasar
 Dengan pengembangan aplikasi *KaloriMe* ini bisa dapat dikembangkan di pasar industri untuk digunakan oleh pihak tertentu dengan :
