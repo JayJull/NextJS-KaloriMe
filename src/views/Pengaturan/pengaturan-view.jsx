@@ -407,7 +407,7 @@ const ProfileView = () => {
       />
     </div>
   ) : (
-    <div className="bg-teal-500 text-white font-bold w-20 h-20 sm:w-24 sm:h-24 lg:w-28 lg:h-28 rounded-full flex items-center justify-center text-2xl">
+    <div className="bg-teal-500 text-white font-bold w-20 h-20 sm:w-24 sm:h-24 lg:w-28 lg:h-28 rounded-full flex items-center justify-center text-xl">
       {(formData.nama || session?.user?.name || "Guest")
         .charAt(0)
         .toUpperCase()}
@@ -432,7 +432,7 @@ const ProfileView = () => {
           </div>
         </div>
 
-        <div className="max-w-2xl mx-auto px-4 py-8">
+        <div className="max-w-2xl mx-auto px-4 py-8 text-black">
           {/* Health Stats Cards */}
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
             <div className="bg-white rounded-lg p-4 text-center shadow-sm">

@@ -8,12 +8,13 @@ import LoginModal from "@/views/login/LoginModal";
 import RegisterModal from "@/views/register/RegisterModal";
 import dynamic from "next/dynamic";
 import { AnimatePresence } from "framer-motion";
+import DemoModal from '@/components/DemoModal';
 
 export default function Home() {
   const [showLogin, setShowLogin] = useState(false);
   const [showRegister, setShowRegister] = useState(false);
   const [activeSection, setActiveSection] = useState("beranda");
-
+  const [isOpen, setIsOpen] = useState(false);
   const berandaRef = useRef(null);
   const programdietRef = useRef(null);
   const carakerjaRef = useRef(null);
@@ -584,12 +585,7 @@ export default function Home() {
                 >
                   Daftar Gratis Sekarang
                 </a>
-
-                <a href="" className="w-full sm:w-auto">
-                  <button className="w-full sm:w-auto bg-white/90 text-teal-500 px-6 sm:px-8 py-3 sm:py-4 rounded-full text-base sm:text-lg font-semibold border-2 border-teal-500 shadow-md hover:bg-teal-500 hover:text-white transition-all duration-300 ease-in-out backdrop-blur-sm hover:scale-105">
-                    Lihat Demo
-                  </button>
-                </a>
+                  <DemoModal />
               </div>
             </div>
           </div>

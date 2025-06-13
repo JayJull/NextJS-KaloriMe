@@ -6,9 +6,9 @@ import { format } from 'date-fns'
 import { id } from 'date-fns/locale'
 import 'react-datepicker/dist/react-datepicker.css'
 import Image from 'next/image'
-import { useSession } from '@/contexts/SessionContext'
 import { useRouter } from 'next/navigation'
 import React from 'react';
+import { signOut, useSession } from 'next-auth/react'
 
 export default function Header({ title, subtitle }) {
   const [searchQuery, setSearchQuery] = useState('')
@@ -17,7 +17,7 @@ export default function Header({ title, subtitle }) {
   const [open, setOpen] = useState(false)
   const [showMobileSearch, setShowMobileSearch] = useState(false)
   const [showMobileMenu, setShowMobileMenu] = useState(false)
-  const { user: session } = useSession()
+  const { data: session, status } = useSession()
   const dropdownRef = useRef(null)
   const router = useRouter()
 
@@ -57,7 +57,7 @@ const avatarSmall = session?.user?.image ? (
     </div>
   ) : (
     <span className="bg-blue-500 text-white font-bold w-10 sm:w-9 lg:w-10 h-10 sm:h-9 lg:h-10 rounded-full flex items-center justify-center text-base sm:text-xl lg:text-2xl">
-      {(session?.nama || "Guest").charAt(0)}
+      {(session?.user?.name || "Guest").charAt(0)}
     </span>
   )
 
@@ -72,13 +72,13 @@ const avatarSmall = session?.user?.image ? (
     </div>
   ) : (
     <span className="bg-blue-500 text-white font-bold w-20 sm:w-15 lg:w-20 h-20 sm:h-15 lg:h-20 rounded-full flex items-center justify-center text-2xl">
-      {(session?.nama || "Guest").charAt(0)}
+      {(session?.user?.name || "Guest").charAt(0)}
     </span>
   )
 
   const user = {
-    name: session?.nama || "Guest",
-    email: session?.email || "guest@example.com",
+    name: session?.user?.nama || "Guest",
+    email: session?.user?.email || "guest@example.com",
   }
 
  async function logout() {
@@ -269,7 +269,7 @@ const avatarSmall = session?.user?.image ? (
                   {avatarSmall}
                 </div>
                 <div className="text-gray-600 font-semibold text-xs sm:text-sm truncate max-w-20 sm:max-w-32 md:max-w-none hidden sm:block lg:block">
-                  {user.name}
+                  {session?.user?.name}
                 </div>
                 <ChevronDown size={16} className="text-gray-500 hidden sm:block" />
               </button>
@@ -293,7 +293,7 @@ const avatarSmall = session?.user?.image ? (
 
                     {/* User Info */}
                     <div className="text-base sm:text-lg text-gray-900 font-semibold truncate px-4">
-                      {user.name}
+                      {session?.user?.name}
                     </div>
                     <div className="text-xs sm:text-sm text-gray-600 mt-1 truncate px-4">
                       {user.email}

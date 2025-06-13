@@ -1,7 +1,7 @@
 import "./globals.css";
 import { Quicksand } from "next/font/google";
 import ClientLayout from "./client-layout";
-import { SessionProvider } from "@/contexts/SessionContext";
+import SessionWrapper from "@/components/SessionWrapper";
 
 const quicksand = Quicksand({
   subsets: ['latin'],
@@ -24,11 +24,12 @@ export default function RootLayout({ children }) {
         <link rel="icon" href="/app/favicon.ico" type="image/x-icon" />
       </head>
       <body className={quicksand.className}>
-        <SessionProvider>
+        <SessionWrapper>
           <ClientLayout>
             {children}
           </ClientLayout>
-        </SessionProvider>
+        </SessionWrapper>
+        
       </body>
     </html>
   );

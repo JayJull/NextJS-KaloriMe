@@ -1,4 +1,4 @@
-import { db } from "@/lib/db"
+
 
 export async function createSession(userId, sessionId, expiresAt) {
   await db.query(
