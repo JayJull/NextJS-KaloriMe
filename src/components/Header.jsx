@@ -285,7 +285,7 @@ const avatarSmall = session?.user?.image ? (
                     {/* Edit Profile Button */}
                     <button
                         onClick={() => signOut({callbackUrl: '/'})}
-                        className="mt-5 w-full border border-red-600 rounded-full flex items-center justify-center px-3 py-2 text-red-600 hover:bg-red-100 rounded-lg"
+                        className="mt-5 w-full border border-red-600 rounded-full flex items-center justify-center px-3 py-2 text-red-600 hover:bg-red-100"
                     >
                         <LogOut size={20} />
                         <span className="ml-3 font-medium">Keluar</span>

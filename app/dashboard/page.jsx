@@ -1,11 +1,18 @@
 'use client'
+
+import App from '@/layout/app'
 import StatCard from '@/components/StatCard'
 import ActivityList from '@/components/ActivityList'
-
 import { TrendingUp, Target, Calendar, Coffee } from 'lucide-react'
-import App from '@/layout/app'
+import { useEffect, useState } from 'react'
+import { useSearchParams } from 'next/navigation'
 
 export default function Dashboard() {
+  const [foods, setFoods] = useState([])
+  const [loading, setLoading] = useState(true)
+  const searchParams = useSearchParams()
+  const userId = searchParams.get('userId') // Ambil userId dari URL
+
   const statsData = [
     {
       title: "Kalori Hari Ini",
@@ -38,10 +45,28 @@ export default function Dashboard() {
     }
   ]
 
+  useEffect(() => {
+    async function fetchFoods() {
+      try {
+        const res = await fetch(`/api/food/upload?userId=${userId}&type=foods`)
+        const data = await res.json()
+        if (data.success) {
+          setFoods(data.data)
+        } else {
+          console.error("Gagal memuat data:", data.message)
+        }
+      } catch (err) {
+        console.error("Fetch error:", err)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    if (userId) fetchFoods()
+  }, [userId])
+
   return (
-    <App
-      title="Dashboard"
-    >
+    <App title="Dashboard">
       <div className="p-6 space-y-6">
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -50,8 +75,12 @@ export default function Dashboard() {
           ))}
         </div>
 
-        {/* Recent Activity */}
-        <ActivityList />
+        {/* Aktivitas Makanan Hari Ini */}
+        {loading ? (
+          <p className="text-gray-500">Memuat aktivitas makanan...</p>
+        ) : (
+          <ActivityList foods={foods} />
+        )}
       </div>
     </App>
   )
