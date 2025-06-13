@@ -23,12 +23,27 @@ Pada pengembangan aplikasi *KaloriMe* ini, tujuan utama dari proyek ini adalah u
 
 ### Front-End & Back-End
 - Tools: Figma
-- Bahasa pemrograman: JavaScript, Node.js, React.js
+- Bahasa pemrograman: JavaScript, Node.js, React.js, Next.js
+- Database : PostgreSQL
 
 ### Dataset
+sebelum melakukan pelatihan model, maka tim kami mencari dataset yang akan dilatih selanjutnya, maka dataset yang kami gunakan dari platform **Kaggle**. berikut link datasetnya berupa google drive yang telah di ZIP : https://drive.google.com/file/d/1XUR76K8kIVw7nfqwSaWp1ZLLw5oDeYTT/view .
 
 ### Implementation 
 Pada pengimplementasian proyek ini melibatkan pengembangan sistem dengan mengupload makanan yang memberikan hasil *name_class* dan *confident* dari gambar yang diupload pada aplikasi. dengan ini menggunakan pemrosesan model dari **MobilNetV2** yang telah dilatih sebelumnya. setelah melakukan penguploadan gambar makanan maka secara otomatis mendapatkan hasil *jumlah kalori, name_class, confident* dari gambar tersebut.Aplikasi *KaloriMe* ini memberikan kemudahan bagi pengguna dalam proses diet/pola makan yang seimbang.
+
+## Cara Menjalankan Aplikasi KaloriMe - 
+1. Clone Repository<br>
+Git Clone https://github.com/JayJull/NextJS-KaloriMe.git
+cd NextJS-KaloriMe
+
+2. Menjalankan di CMD/Terminal
+npm install
+npm run dev
+
+3. Menjalankan di browser
+Port : http://192.168.56.1:3000
+Jalankan di browser.  
 
 ### Target Pasar
 Dengan pengembangan aplikasi *KaloriMe* ini bisa dapat dikembangkan di pasar industri untuk digunakan oleh pihak tertentu dengan :
