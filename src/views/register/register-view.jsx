@@ -105,7 +105,8 @@ const RegisterView = ({ onSwitchToLogin, onClose }) => {
     } finally {
       setLoading(false);
     }
-
+  };
+  
   return (
     <div className="w-full">
       {/* Header */}
