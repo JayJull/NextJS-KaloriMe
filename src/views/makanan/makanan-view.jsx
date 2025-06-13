@@ -193,10 +193,6 @@ export default function MakananView() {
                           src={food.foto}
                           alt={food.nama}
                           className="w-16 h-16 object-cover rounded-lg shadow-md"
-                          onError={(e) => {
-                            e.target.src =
-                              "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=150&h=150&fit=crop&crop=center";
-                          }}
                         />
                       </td>
                       <td className="px-6 py-4">

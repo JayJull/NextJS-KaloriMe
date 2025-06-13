@@ -2,12 +2,16 @@
 import { NextRequest, NextResponse } from "next/server";
 import { FoodPresenter } from "@/presenters/FoodPresenter";
 import { FoodService } from "@/models/FoodModel";
+import { writeFile, mkdir } from "fs/promises";
+import path from "path";
 
 export async function POST(request) {
   try {
     const formData = await request.formData();
     const file = formData.get("image");
     const userId = formData.get("userId");
+    const uploadType = formData.get("uploadType"); // 'camera' or 'file'
+    const timestamp = formData.get("timestamp");
 
     if (!file) {
       return NextResponse.json(
@@ -39,10 +43,55 @@ export async function POST(request) {
       );
     }
 
-    console.log("Processing upload for user:", userId, "file:", file.name);
+    console.log(
+      "Processing upload for user:",
+      userId,
+      "file:",
+      file.name,
+      "type:",
+      uploadType
+    );
 
-    // Process upload dengan presenter
-    const result = await FoodPresenter.processUpload(file, userId);
+    // Simpan file ke storage
+    const bytes = await file.arrayBuffer();
+    const buffer = Buffer.from(bytes);
+
+    // Generate unique filename
+    const fileExtension = path.extname(file.name) || ".jpg";
+    const fileName = `${userId}_${timestamp || Date.now()}_${Math.random()
+      .toString(36)
+      .substring(7)}${fileExtension}`;
+
+    // Buat directory jika belum ada
+    const uploadDir = path.join(process.cwd(), "public", "uploads", "foods");
+    try {
+      await mkdir(uploadDir, { recursive: true });
+    } catch (error) {
+      console.log("Directory already exists or created");
+    }
+
+    // Simpan file
+    const filePath = path.join(uploadDir, fileName);
+    await writeFile(filePath, buffer);
+
+    // Generate URL untuk akses file
+    const imageUrl = `/uploads/foods/${fileName}`;
+
+    console.log("File saved successfully:", {
+      fileName,
+      filePath,
+      imageUrl,
+      fileSize: file.size,
+    });
+
+    // Process upload dengan presenter, berikan imageUrl
+    const result = await FoodPresenter.processUpload(file, userId, {
+      imageUrl,
+      fileName,
+      originalName: file.name,
+      uploadType,
+      fileSize: file.size,
+    });
 
     if (!result.success) {
       return NextResponse.json(result, {
@@ -50,7 +99,16 @@ export async function POST(request) {
       });
     }
 
-    return NextResponse.json(result, { status: 201 });
+    // Pastikan imageUrl dikembalikan dalam response
+    return NextResponse.json(
+      {
+        ...result,
+        imageUrl, // URL gambar yang disimpan
+        fileName,
+        uploadedAt: new Date().toISOString(),
+      },
+      { status: 201 }
+    );
   } catch (error) {
     console.error("Upload API error:", error);
     return NextResponse.json(
@@ -87,6 +145,18 @@ export async function GET(request) {
       // Get all food reports for makanan view
       const reports = await FoodPresenter.getAllFoodReports(userId);
       data = FoodPresenter.formatFoodData(reports);
+
+      // Pastikan setiap item memiliki imageUrl yang benar
+      data = data.map((item) => ({
+        ...item,
+        foto: item.imageUrl || item.foto || item.image_url,
+        // Tambahkan metadata
+        source:
+          item.source || (item.ai_prediction ? "ai_prediction" : "user_upload"),
+        uploadedAt: item.created_at || item.uploadedAt,
+      }));
+
+      console.log("Returning food data:", data.length, "items");
     } else {
       // Get all reports
       const reports = await FoodService.getAllReports();
@@ -98,6 +168,7 @@ export async function GET(request) {
     return NextResponse.json({
       success: true,
       data: data,
+      timestamp: new Date().toISOString(),
     });
   } catch (error) {
     console.error("Get data API error:", error);

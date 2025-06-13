@@ -99,17 +99,22 @@ export default function UploadModal({ isOpen, onClose, onUpload }) {
       canvas.width = video.videoWidth;
       canvas.height = video.videoHeight;
       ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-      const dataUrl = canvas.toDataURL("image/png");
 
-      fetch(dataUrl)
-        .then((res) => res.arrayBuffer())
-        .then((buffer) => {
-          const file = new File([buffer], `capture-${Date.now()}.png`, {
-            type: "image/png",
-          });
-          setSelectedImage(file);
-          setImagePreview(dataUrl);
-        });
+      // Convert canvas to blob untuk memastikan kualitas gambar terbaik
+      canvas.toBlob(
+        (blob) => {
+          if (blob) {
+            const file = new File([blob], `capture-${Date.now()}.jpg`, {
+              type: "image/jpeg",
+              lastModified: Date.now(),
+            });
+            setSelectedImage(file);
+            setImagePreview(canvas.toDataURL("image/jpeg", 0.9)); // Kualitas 90%
+          }
+        },
+        "image/jpeg",
+        0.9
+      ); // Kualitas JPEG 90%
     }
   };
 
@@ -126,12 +131,28 @@ export default function UploadModal({ isOpen, onClose, onUpload }) {
 
       if (!userId) {
         alert("User ID tidak ditemukan. Silakan login kembali.");
+        setIsUploading(false);
         return;
       }
 
       const formData = new FormData();
-      formData.append("image", selectedImage);
+      // Pastikan file yang dikirim adalah file asli user
+      formData.append("image", selectedImage, selectedImage.name);
       formData.append("userId", userId);
+
+      // Tambahkan metadata untuk membantu backend
+      formData.append(
+        "uploadType",
+        selectedImage.name.includes("capture") ? "camera" : "file"
+      );
+      formData.append("timestamp", Date.now().toString());
+
+      console.log("Uploading file:", {
+        name: selectedImage.name,
+        size: selectedImage.size,
+        type: selectedImage.type,
+        lastModified: selectedImage.lastModified,
+      });
 
       const response = await fetch("/api/food/upload", {
         method: "POST",
@@ -147,13 +168,24 @@ export default function UploadModal({ isOpen, onClose, onUpload }) {
           setPredictionInfo(result.predictionInfo);
           setShowConfirmation(true);
         } else {
-          // Sukses langsung - panggil callback parent
+          // Sukses langsung - panggil callback parent dengan data lengkap
           if (onUpload) {
-            onUpload(selectedImage);
+            onUpload({
+              file: selectedImage,
+              preview: imagePreview,
+              uploadedImageUrl: result.imageUrl, // URL gambar yang disimpan di server
+              foodData: result.data,
+            });
           }
+
+          // Reset form
           setSelectedImage(null);
           setImagePreview("");
           onClose();
+
+          if (result.message) {
+            alert(result.message);
+          }
         }
       } else {
         if (result.showPopup) {
@@ -162,12 +194,12 @@ export default function UploadModal({ isOpen, onClose, onUpload }) {
           setShowComingSoon(true);
           console.log("Prediction info:", result.predictionInfo);
         } else {
-          alert(result.message);
+          alert(result.message || "Gagal mengupload gambar");
         }
       }
     } catch (error) {
       console.error("Upload error:", error);
-      alert("Terjadi kesalahan saat upload");
+      alert("Terjadi kesalahan saat upload: " + error.message);
     } finally {
       setIsUploading(false);
     }
@@ -184,29 +216,44 @@ export default function UploadModal({ isOpen, onClose, onUpload }) {
         },
         body: JSON.stringify({
           confirmationData: confirmationData,
+          // Kirim juga data gambar untuk memastikan foto user tersimpan
+          imageData: {
+            fileName: selectedImage?.name,
+            fileSize: selectedImage?.size,
+            fileType: selectedImage?.type,
+          },
         }),
       });
 
       const result = await response.json();
 
       if (result.success) {
-        // Sukses - panggil callback parent
+        // Sukses - panggil callback parent dengan data lengkap
         if (onUpload) {
-          onUpload(selectedImage);
+          onUpload({
+            file: selectedImage,
+            preview: imagePreview,
+            uploadedImageUrl: result.imageUrl, // URL gambar yang disimpan di server
+            foodData: result.data,
+            confirmed: true,
+          });
         }
+
+        // Reset semua state
         setSelectedImage(null);
         setImagePreview("");
         setShowConfirmation(false);
         setConfirmationData(null);
         setPredictionInfo(null);
         onClose();
-        alert(result.message);
+
+        alert(result.message || "Makanan berhasil ditambahkan!");
       } else {
-        alert(result.message);
+        alert(result.message || "Gagal menyimpan data makanan");
       }
     } catch (error) {
       console.error("Confirm error:", error);
-      alert("Terjadi kesalahan saat menyimpan data");
+      alert("Terjadi kesalahan saat menyimpan data: " + error.message);
     } finally {
       setIsUploading(false);
     }
@@ -216,6 +263,9 @@ export default function UploadModal({ isOpen, onClose, onUpload }) {
     setShowConfirmation(false);
     setConfirmationData(null);
     setPredictionInfo(null);
+    // Tetap reset gambar karena user menolak
+    setSelectedImage(null);
+    setImagePreview("");
   };
 
   const handleClose = () => {
@@ -298,7 +348,12 @@ export default function UploadModal({ isOpen, onClose, onUpload }) {
                 className="w-full h-40 object-cover rounded-md border"
               />
               <p className="text-xs text-gray-600 mt-1 truncate text-center">
-                {selectedImage?.name || "camera-capture.png"}
+                {selectedImage?.name || "camera-capture.jpg"}
+              </p>
+              <p className="text-xs text-gray-500 text-center">
+                {selectedImage?.size
+                  ? `${(selectedImage.size / 1024).toFixed(1)} KB`
+                  : ""}
               </p>
             </div>
           )}
@@ -377,6 +432,18 @@ export default function UploadModal({ isOpen, onClose, onUpload }) {
               )}
             </div>
 
+            {/* Preview gambar user di dialog konfirmasi */}
+            {imagePreview && (
+              <div className="mb-4">
+                <img
+                  src={imagePreview}
+                  alt="Gambar Anda"
+                  className="w-24 h-24 object-cover rounded-lg mx-auto border-2 border-teal-200"
+                />
+                <p className="text-xs text-gray-500 mt-1">Gambar Anda</p>
+              </div>
+            )}
+
             <p className="text-gray-600 mb-6">
               Apakah Anda ingin menambahkan makanan ini ke dalam catatan
               konsumsi Anda?
@@ -417,6 +484,18 @@ export default function UploadModal({ isOpen, onClose, onUpload }) {
             <h3 className="text-xl font-bold text-gray-800 mb-2">
               AI Prediction Result
             </h3>
+
+            {/* Preview gambar user di coming soon popup */}
+            {imagePreview && (
+              <div className="mb-4">
+                <img
+                  src={imagePreview}
+                  alt="Gambar Anda"
+                  className="w-20 h-20 object-cover rounded-lg mx-auto border"
+                />
+                <p className="text-xs text-gray-500 mt-1">Gambar Anda</p>
+              </div>
+            )}
 
             {predictionInfo?.success && predictionInfo?.predicted_class ? (
               <div className="mb-4">

@@ -1,7 +1,7 @@
 export const makanan = [
   {
     id: 1,
-    nama: "Gudeg",
+    nama: "Nasi Gudeg",
     kategori: "sarapan",
     foto: "https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=150&h=150&fit=crop&crop=center",
     kalori: 350,
