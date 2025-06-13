@@ -58,6 +58,12 @@ const LoginView = ({ onSwitchToRegister }) => {
       });
 
       if (res?.ok) {
+        const response = await fetch("/api/session-user");
+        const data = await response.json();
+
+        if (data?.user?.id) {
+          localStorage.setItem("userId", data.user.id);
+        }
         router.push("/dashboard");
       } else {
         setError("Email atau password salah. Silakan periksa kembali.");
@@ -267,19 +273,6 @@ const LoginView = ({ onSwitchToRegister }) => {
                 className="w-5 h-5 mr-2"
               />
               Google
-            </button>
-
-            <button
-              type="button"
-              className="w-full inline-flex justify-center items-center px-4 py-3 border border-gray-300 rounded-lg bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors duration-200"
-              onClick={() => handleSocialLogin("facebook")}
-            >
-              <img
-                src="/icons/facebook.svg"
-                alt="Facebook"
-                className="w-5 h-5 mr-2"
-              />
-              Facebook
             </button>
           </div>
         </div>

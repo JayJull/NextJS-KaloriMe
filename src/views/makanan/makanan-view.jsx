@@ -1,74 +1,118 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Plus, Edit2, Trash2, Save, X, Upload, Image } from "lucide-react";
+import {
+  Plus,
+  Edit2,
+  Trash2,
+  Save,
+  X,
+  Upload,
+  Image,
+  RefreshCw,
+} from "lucide-react";
 import { makanan, kategoriMakanan } from "@/data/interface";
 import App from "@/layout/app";
 import UploadModal from "@/views/makanan/uploadModal";
-
 
 export default function MakananView() {
   const title = "Makanan";
 
   const [foods, setFoods] = useState([]);
-  const [isModalOpen, setIsModalOpen] = useState(false); 
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    loadFoods();
+  }, []);
+
+  const loadFoods = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+
+      const userId = localStorage.getItem("userId");
+      if (!userId) {
+        setError("User ID tidak ditemukan. Silakan login kembali.");
+        return;
+      }
+
+      const response = await fetch(
+        `/api/food/upload?userId=${userId}&type=foods`
+      );
+      const result = await response.json();
+
+      if (result.success) {
+        setFoods(result.data);
+      } else {
+        setError(result.message);
+      }
+    } catch (err) {
+      console.error("Error loading foods:", err);
+      setError("Gagal memuat data makanan");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   const openModal = () => setIsModalOpen(true);
   const closeModal = () => setIsModalOpen(false);
 
-  const handleUpload = async (imageFile) => {
-  const formData = new FormData();
-  formData.append("image", imageFile);
-
-  try {
-    const response = await fetch("/api/predict-makanan", {
-      method: "POST",
-      body: formData,
-    });
-
-  const result = {
-    nama_makanan: "Rawon" 
+  const handleUpload = async (newImage) => {
+    // Refresh data setelah upload berhasil
+    await loadFoods();
+    closeModal();
   };
-  // const result = await response.json(); 
-    const predictedName = result.nama_makanan; // contoh: "Nasi Goreng"
 
-    if (!predictedName) {
-      alert("Gagal mengenali makanan.");
+  const handleDelete = async (foodId) => {
+    if (!confirm("Apakah Anda yakin ingin menghapus makanan ini?")) {
       return;
     }
 
-    // Cari di tabel makanan (data lokal)
-    const found = makanan.find((item) =>
-      item.nama.toLowerCase() === predictedName.toLowerCase()
+    try {
+      const userId = localStorage.getItem("userId");
+      const response = await fetch(
+        `/api/food/upload?id=${foodId}&userId=${userId}`,
+        {
+          method: "DELETE",
+        }
+      );
+
+      const result = await response.json();
+
+      if (result.success) {
+        alert("Makanan berhasil dihapus");
+        await loadFoods(); // Refresh data
+      } else {
+        alert(result.message);
+      }
+    } catch (error) {
+      console.error("Error deleting food:", error);
+      alert("Gagal menghapus makanan");
+    }
+  };
+
+  const handleRefresh = () => {
+    loadFoods();
+  };
+
+  if (loading) {
+    return (
+      <App>
+        <div className="min-h-screen bg-gradient-to-br from-teal-50 to-red-50 p-6">
+          <div className="max-w-7xl mx-auto">
+            <div className="flex items-center justify-center h-64">
+              <div className="flex items-center gap-3">
+                <RefreshCw className="animate-spin" size={24} />
+                <span className="text-lg">Memuat data makanan...</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </App>
     );
-
-    if (!found) {
-      alert(`Makanan "${predictedName}" tidak ditemukan di database.`);
-      return;
-    }
-
-    // Tambahkan ke tabel yang dimakan
-    const newFood = {
-      ...found,
-      id: Date.now(), // Biar unik
-      foto: URL.createObjectURL(imageFile),
-    };
-
-    setFoods([newFood, ...foods]);
-  } catch (error) {
-    console.error("Error saat prediksi:", error);
-    alert("Terjadi kesalahan saat memproses gambar.");
   }
-};
-
-const handleDelete = (id) => {
-  const confirmed = confirm("Apakah Anda yakin ingin menghapus makanan ini?");
-  if (!confirmed) return;
-
-  const updatedFoods = foods.filter((item) => item.id !== id);
-  setFoods(updatedFoods);
-};
-
 
   return (
     <App>
@@ -82,14 +126,32 @@ const handleDelete = (id) => {
                 <p className="text-gray-600 mt-2">
                   Kelola makanan dan kalori Anda
                 </p>
+                {error && (
+                  <div className="mt-2 p-2 bg-red-100 text-red-700 rounded-md text-sm">
+                    {error}
+                  </div>
+                )}
               </div>
-              <button
-                onClick={() => openModal()}
-                className="bg-teal-500 hover:bg-teal-600 text-white px-6 py-3 rounded-lg flex items-center gap-2 transition-colors shadow-md"
-              >
-                <Plus size={20} />
-                Tambah Makanan{" "}
-              </button>
+              <div className="flex gap-3">
+                <button
+                  onClick={handleRefresh}
+                  className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-3 rounded-lg flex items-center gap-2 transition-colors shadow-md"
+                  disabled={loading}
+                >
+                  <RefreshCw
+                    size={20}
+                    className={loading ? "animate-spin" : ""}
+                  />
+                  Refresh
+                </button>
+                <button
+                  onClick={openModal}
+                  className="bg-teal-500 hover:bg-teal-600 text-white px-6 py-3 rounded-lg flex items-center gap-2 transition-colors shadow-md"
+                >
+                  <Plus size={20} />
+                  Tambah Makanan
+                </button>
+              </div>
             </div>
           </div>
 
@@ -109,6 +171,10 @@ const handleDelete = (id) => {
                     <th className="px-6 py-4 text-left font-semibold">
                       Kalori
                     </th>
+                    <th className="px-6 py-4 text-left font-semibold">
+                      Tanggal
+                    </th>
+                    <th className="px-6 py-4 text-left font-semibold">Waktu</th>
                     <th className="px-6 py-4 text-center font-semibold">
                       Aksi
                     </th>
@@ -149,6 +215,16 @@ const handleDelete = (id) => {
                         </span>
                       </td>
                       <td className="px-6 py-4">
+                        <span className="text-sm text-gray-600">
+                          {food.tanggal_formatted}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4">
+                        <span className="text-sm text-gray-600">
+                          {food.waktu}
+                        </span>
+                      </td>
+                      <td className="px-6 py-4">
                         <div className="flex justify-center gap-2">
                           <button
                             onClick={() => handleDelete(food.id)}
@@ -164,10 +240,13 @@ const handleDelete = (id) => {
                 </tbody>
               </table>
 
-              {foods.length === 0 && (
+              {foods.length === 0 && !loading && (
                 <div className="text-center py-12">
                   <p className="text-gray-500 text-lg">
                     Belum ada data makanan
+                  </p>
+                  <p className="text-gray-400 text-sm mt-2">
+                    Klik "Tambah Makanan" untuk menambah data
                   </p>
                 </div>
               )}
@@ -175,11 +254,12 @@ const handleDelete = (id) => {
           </div>
         </div>
       </div>
+
       <UploadModal
-  isOpen={isModalOpen}
-  onClose={closeModal}
-  onUpload={handleUpload}
-/>
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        onUpload={handleUpload}
+      />
     </App>
   );
 }

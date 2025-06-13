@@ -15,16 +15,29 @@ export const authOptions = {
         email: { label: "Email", type: "email" },
         password: { label: "Password", type: "password" },
       },
-      async authorize(credentials) {
+      async authorize(credentials, req) {
         try {
           if (!credentials?.email || !credentials?.password) {
             return null;
           }
 
-          const result = await LoginPresenter.handleLogin({
-            email: credentials.email,
-            password: credentials.password,
-          });
+          const forwarded = req?.headers?.["x-forwarded-for"];
+          const ipAddress = forwarded
+            ? forwarded.split(",")[0].trim()
+            : req?.headers?.["x-real-ip"] || null;
+
+          const userAgent = req?.headers?.["user-agent"] || null;
+
+          const result = await LoginPresenter.handleLogin(
+            {
+              email: credentials.email,
+              password: credentials.password,
+            },
+            {
+              ipAddress,
+              userAgent,
+            }
+          );
 
           if (result.success && result.user) {
             return {
@@ -33,6 +46,7 @@ export const authOptions = {
               email: result.user.email,
               image: null,
               userData: result.user,
+              loginInfo: result.loginInfo,
             };
           }
 
@@ -65,7 +79,7 @@ export const authOptions = {
   ],
 
   callbacks: {
-    async signIn({ user, account, profile }) {
+    async signIn({ user, account, profile, email, credentials }) {
       // Handle OAuth sign in (Google & Facebook)
       if (account?.provider === "google" || account?.provider === "facebook") {
         try {
@@ -75,7 +89,7 @@ export const authOptions = {
             account.provider
           );
 
-          // Handle OAuth login
+          // Handle OAuth login dengan request info
           const result = await LoginPresenter.handleOAuthLogin(oauthData);
 
           if (result.success && result.user) {
@@ -85,6 +99,7 @@ export const authOptions = {
             user.email = result.user.email;
             user.userData = result.user;
             user.isNewUser = result.isNewUser;
+            user.loginInfo = result.loginInfo;
 
             return true;
           }
@@ -101,11 +116,17 @@ export const authOptions = {
       return true;
     },
 
-    async jwt({ token, user, account }) {
+    async jwt({ token, user, account, trigger, session }) {
       // Simpan data user ke token saat pertama kali login
       if (user?.userData) {
         token.userData = user.userData;
         token.isNewUser = user.isNewUser;
+        token.loginInfo = user.loginInfo;
+      }
+
+      // Handle session update
+      if (trigger === "update" && session) {
+        token.userData = { ...token.userData, ...session.userData };
       }
 
       return token;
@@ -121,6 +142,9 @@ export const authOptions = {
           image: session.user.image,
           userData: token.userData,
           isNewUser: token.isNewUser,
+          loginInfo: token.loginInfo,
+          // Format session info untuk display
+          sessionInfo: LoginPresenter.formatSessionInfo(token.loginInfo),
         };
       }
 
@@ -128,14 +152,34 @@ export const authOptions = {
     },
   },
 
+  events: {
+    async signIn({ user, account, profile, isNewUser }) {
+      console.log("Sign in event:", {
+        user: user.email,
+        provider: account?.provider,
+        isNewUser,
+        loginInfo: user.loginInfo,
+      });
+    },
+
+    async signOut({ session, token }) {
+      console.log("Sign out event:", {
+        user: session?.user?.email || token?.userData?.email,
+      });
+
+      // Optional: Deactivate session di database
+      // Implementasi tergantung kebutuhan
+    },
+  },
+
   pages: {
-    signIn: "/login",
     error: "/auth/error",
   },
 
   session: {
     strategy: "jwt",
     maxAge: 24 * 60 * 60, // 24 hours
+    updateAge: 24 * 60 * 60, // 24 hours
   },
 
   jwt: {

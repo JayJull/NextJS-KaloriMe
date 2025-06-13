@@ -2,8 +2,25 @@
 import { LoginModel } from "@/models/LoginModel";
 
 export class LoginPresenter {
+  // Extract request metadata
+  static extractRequestMetadata(request) {
+    try {
+      const forwarded = request.headers.get("x-forwarded-for");
+      const realIp = request.headers.get("x-real-ip");
+      const remoteAddr = request.headers.get("remote-addr");
+
+      const ipAddress =
+        forwarded?.split(",")[0] || realIp || remoteAddr || "unknown";
+      const userAgent = request.headers.get("user-agent") || "unknown";
+
+      return { ipAddress, userAgent };
+    } catch (error) {
+      return { ipAddress: "unknown", userAgent: "unknown" };
+    }
+  }
+
   // Handle login dengan email dan password
-  static async handleLogin(userData) {
+  static async handleLogin(userData, request = null) {
     try {
       // Validasi input
       const validation = LoginModel.validateLoginData(userData);
@@ -15,16 +32,26 @@ export class LoginPresenter {
         };
       }
 
-      // Autentikasi user
+      // Extract metadata dari request
+      const metadata = request ? this.extractRequestMetadata(request) : {};
+
+      // Autentikasi user dengan metadata
       const user = await LoginModel.authenticateUser(
         userData.email,
-        userData.password
+        userData.password,
+        metadata
       );
 
       return {
         success: true,
         message: "Login berhasil! Selamat datang kembali.",
         user: user,
+        loginInfo: {
+          lastSignIn: user.last_sign_in,
+          currentSignIn: user.current_sign_in,
+          signInCount: user.sign_in_count,
+          isReturningUser: user.sign_in_count > 1,
+        },
       };
     } catch (error) {
       console.error("Login error:", error);
@@ -63,7 +90,7 @@ export class LoginPresenter {
   }
 
   // Handle login OAuth (Google/Facebook)
-  static async handleOAuthLogin(oauthData) {
+  static async handleOAuthLogin(oauthData, request = null) {
     try {
       // Validasi data OAuth
       const validation = LoginModel.validateOAuthData(oauthData);
@@ -75,12 +102,15 @@ export class LoginPresenter {
         };
       }
 
+      // Extract metadata dari request
+      const metadata = request ? this.extractRequestMetadata(request) : {};
+
       // Cari user yang sudah ada berdasarkan email
       const existingUser = await LoginModel.findUserByEmail(oauthData.email);
       const isNewUser = !existingUser;
 
-      // Cari atau buat user OAuth
-      const user = await LoginModel.findOrCreateOAuthUser(oauthData);
+      // Cari atau buat user OAuth dengan metadata
+      const user = await LoginModel.findOrCreateOAuthUser(oauthData, metadata);
 
       return {
         success: true,
@@ -89,6 +119,12 @@ export class LoginPresenter {
           : `Login berhasil dengan ${oauthData.provider}! Selamat datang kembali.`,
         user: user,
         isNewUser: isNewUser,
+        loginInfo: {
+          lastSignIn: user.last_sign_in,
+          currentSignIn: user.current_sign_in,
+          signInCount: user.sign_in_count,
+          isReturningUser: user.sign_in_count > 1,
+        },
       };
     } catch (error) {
       console.error("OAuth login error:", error);
@@ -119,12 +155,34 @@ export class LoginPresenter {
         hasPassword: !!user.password, // Jika ada password, berarti bukan OAuth
         provider: user.provider,
         loginMethod: user.provider ? "oauth" : "credentials",
+        lastSignIn: user.last_sign_in,
+        signInCount: user.sign_in_count,
+        memberSince: user.created_at,
       };
     } catch (error) {
       console.error("Check user status error:", error);
       return {
         exists: false,
         message: "Terjadi kesalahan saat mengecek status user",
+      };
+    }
+  }
+
+  // Get user sessions
+  static async getUserSessions(userId) {
+    try {
+      const sessions = await LoginModel.getUserSessions(userId);
+      return {
+        success: true,
+        sessions: sessions,
+        activeSessionCount: sessions.length,
+      };
+    } catch (error) {
+      console.error("Get user sessions error:", error);
+      return {
+        success: false,
+        message: "Gagal mengambil data session",
+        sessions: [],
       };
     }
   }
@@ -137,7 +195,49 @@ export class LoginPresenter {
       data: result.user || null,
       errors: result.errors || {},
       isNewUser: result.isNewUser || false,
+      loginInfo: result.loginInfo || null,
     };
+  }
+
+  // Format session info untuk display
+  static formatSessionInfo(loginInfo) {
+    if (!loginInfo) return null;
+
+    const { lastSignIn, currentSignIn, signInCount, isReturningUser } =
+      loginInfo;
+
+    return {
+      welcome: isReturningUser
+        ? `Selamat datang kembali! Login ke-${signInCount}`
+        : "Selamat datang untuk pertama kali!",
+      lastLogin: lastSignIn ? this.formatRelativeTime(lastSignIn) : null,
+      currentLogin: this.formatRelativeTime(currentSignIn),
+      loginCount: signInCount,
+    };
+  }
+
+  // Format relative time
+  static formatRelativeTime(timestamp) {
+    if (!timestamp) return null;
+
+    const now = new Date();
+    const time = new Date(timestamp);
+    const diffInMinutes = Math.floor((now - time) / (1000 * 60));
+
+    if (diffInMinutes < 1) return "Baru saja";
+    if (diffInMinutes < 60) return `${diffInMinutes} menit yang lalu`;
+
+    const diffInHours = Math.floor(diffInMinutes / 60);
+    if (diffInHours < 24) return `${diffInHours} jam yang lalu`;
+
+    const diffInDays = Math.floor(diffInHours / 24);
+    if (diffInDays < 30) return `${diffInDays} hari yang lalu`;
+
+    return time.toLocaleDateString("id-ID", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
   }
 
   // Validasi real-time untuk form login
@@ -187,6 +287,25 @@ export class LoginPresenter {
     } catch (error) {
       console.error("Format OAuth data error:", error);
       throw new Error("Gagal memformat data OAuth");
+    }
+  }
+
+  // Clean expired sessions (untuk maintenance)
+  static async cleanExpiredSessions() {
+    try {
+      const result = await LoginModel.cleanExpiredSessions();
+      return {
+        success: result,
+        message: result
+          ? "Session expired berhasil dibersihkan"
+          : "Gagal membersihkan session expired",
+      };
+    } catch (error) {
+      console.error("Clean expired sessions error:", error);
+      return {
+        success: false,
+        message: "Terjadi kesalahan saat membersihkan session",
+      };
     }
   }
 }
