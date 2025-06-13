@@ -2,7 +2,7 @@
 export const makanan = [
   {
     id: 1,
-    nama: "Nasi Gudeg",
+    nama: "Gudeg",
     kategori: "sarapan",
     foto: "https://images.unsplash.com/photo-1565299624946-b28f40a0ca4b?w=150&h=150&fit=crop&crop=center",
     kalori: 350,
@@ -27,6 +27,27 @@ export const makanan = [
     kategori: "makanan siang",
     foto: "https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?w=150&h=150&fit=crop&crop=center",
     kalori: 420,
+  },
+  {
+    id: 5,
+    nama: "Burger",
+    kategori: "makanan siang",
+    foto: "https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?w=150&h=150&fit=crop&crop=center",
+    kalori: 420,
+  },
+  {
+    id: 6,
+    nama: "Rawon",
+    kategori: "makanan siang",
+    foto: "https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?w=150&h=150&fit=crop&crop=center",
+    kalori: 220,
+  },
+  {
+    id: 7,
+    nama: "Nasi Goreng",
+    kategori: "makanan siang",
+    foto: "https://images.unsplash.com/photo-1604908176997-125f25cc6f3d?w=150&h=150&fit=crop&crop=center",
+    kalori: 220,
   },
 ];
 
