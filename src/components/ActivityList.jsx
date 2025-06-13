@@ -1,33 +1,29 @@
 'use client'
-import { Coffee, Utensils, Cookie, Plus, Clock } from 'lucide-react'
+import App from '@/layout/app'
+import { Coffee, Utensils, Cookie, Clock } from 'lucide-react'
 
-export default function ActivityList() {
-  const activities = [
-    { 
-      id: 1,
-      time: '08:30', 
-      activity: 'Sarapan - Nasi Gudeg', 
-      calories: '420 kal',
-      type: 'breakfast',
-      description: 'Nasi gudeg dengan ayam dan telur'
-    },
-    { 
-      id: 2,
-      time: '12:15', 
-      activity: 'Makan Siang - Ayam Bakar', 
-      calories: '650 kal',
-      type: 'lunch',
-      description: 'Ayam bakar dengan nasi dan lalapan'
-    },
-    { 
-      id: 3,
-      time: '15:45', 
-      activity: 'Snack - Pisang Goreng', 
-      calories: '180 kal',
-      type: 'snack',
-      description: 'Pisang goreng dengan teh manis'
-    }
-  ]
+export default function ActivityList({ foods }) {
+  // Dapatkan tanggal hari ini dalam format YYYY-MM-DD
+  const today = new Date().toISOString().slice(0, 10)
+
+  // Format tanggal jika belum dalam format YYYY-MM-DD
+  const formattedFoods = foods.map(food => ({
+    ...food,
+    tanggal_formatted: new Date(food.tanggal).toISOString().slice(0, 10)
+  }))
+
+  // Filter hanya makanan hari ini
+  const todayFoods = formattedFoods.filter(food => food.tanggal_formatted === today)
+
+  // Mapping data jadi format "activity"
+  const activities = todayFoods.map((food) => ({
+    id: food.id,
+    time: food.waktu || '-', // fallback
+    activity: `${food.kategori} - ${food.nama}`,
+    calories: `${food.kalori} kal`,
+    type: food.kategori.toLowerCase(),
+    description: food.deskripsi || 'Tidak ada deskripsi',
+  }))
 
   const getIcon = (type) => {
     switch (type) {
@@ -52,6 +48,7 @@ export default function ActivityList() {
   }, 0)
 
   return (
+    <App>
     <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-100">
       <div className="flex items-center justify-between mb-6">
         <div>
@@ -108,21 +105,7 @@ export default function ActivityList() {
           </div>
         )}
       </div>
-
-      {/* Quick Add Section */}
-      {/* <div className="mt-6 pt-4 border-t border-gray-100">
-        <p className="text-sm text-gray-600 mb-3">Tambah Cepat:</p>
-        <div className="flex flex-wrap gap-2">
-          {['Nasi Putih', 'Ayam Goreng', 'Sayur Bayam', 'Teh Manis', 'Pisang'].map((food) => (
-            <button
-              key={food}
-              className="px-3 py-1 text-xs bg-gray-100 text-gray-600 rounded-full hover:bg-purple-100 hover:text-purple-600 transition-colors"
-            >
-              + {food}
-            </button>
-          ))}
-        </div>
-      </div> */}
     </div>
-  )
+    </App>
+  );
 }
