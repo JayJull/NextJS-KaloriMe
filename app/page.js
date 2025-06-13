@@ -31,6 +31,13 @@ export default function Home() {
   };
 
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("showLogin") === "1") {
+      setShowLogin(true);
+    }
+  }, []);
+
+  useEffect(() => {
     const handleScroll = () => {
       setShowButton(window.scrollY > 300);
 
