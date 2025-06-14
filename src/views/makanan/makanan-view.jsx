@@ -116,14 +116,14 @@ export default function MakananView() {
 
   return (
     <App>
-      <div className="min-h-screen bg-gradient-to-br from-teal-50 to-red-50 p-6">
+      <div className="min-h-screen bg-gradient-to-br from-teal-50 to-red-50 p-3 sm:p-6">
         <div className="max-w-7xl mx-auto">
           {/* Header */}
-          <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
-            <div className="flex justify-between items-center">
-              <div>
-                <h1 className="text-3xl font-bold text-gray-800">{title}</h1>
-                <p className="text-gray-600 mt-2">
+          <div className="bg-white rounded-xl shadow-lg p-4 sm:p-6 mb-6 sm:mb-8">
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
+              <div className="flex-1">
+                <h1 className="text-2xl sm:text-3xl font-bold text-gray-800">{title}</h1>
+                <p className="text-gray-600 mt-2 text-sm sm:text-base">
                   Kelola makanan dan kalori Anda
                 </p>
                 {error && (
@@ -132,10 +132,10 @@ export default function MakananView() {
                   </div>
                 )}
               </div>
-              <div className="flex gap-3">
+              <div className="flex flex-col sm:flex-row gap-3 w-full sm:w-auto">
                 <button
                   onClick={handleRefresh}
-                  className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-3 rounded-lg flex items-center gap-2 transition-colors shadow-md"
+                  className="bg-gray-500 hover:bg-gray-600 text-white px-4 py-3 rounded-lg flex items-center justify-center gap-2 transition-colors shadow-md w-full sm:w-auto"
                   disabled={loading}
                 >
                   <RefreshCw
@@ -146,7 +146,7 @@ export default function MakananView() {
                 </button>
                 <button
                   onClick={openModal}
-                  className="bg-teal-500 hover:bg-teal-600 text-white px-6 py-3 rounded-lg flex items-center gap-2 transition-colors shadow-md"
+                  className="bg-teal-500 hover:bg-teal-600 text-white px-4 sm:px-6 py-3 rounded-lg flex items-center justify-center gap-2 transition-colors shadow-md w-full sm:w-auto"
                 >
                   <Plus size={20} />
                   Tambah Makanan
@@ -155,28 +155,88 @@ export default function MakananView() {
             </div>
           </div>
 
+          {/* Mobile Card View */}
+        <div className="block sm:hidden">
+          <div className="space-y-4">
+            {foods.map((food) => (
+              <div
+                key={food.id}
+                className="bg-white rounded-xl shadow-lg p-4 hover:shadow-xl transition-shadow"
+              >
+                <div className="flex gap-4">
+                  <img
+                    src={food.foto}
+                    alt={food.nama}
+                    className="w-20 h-20 object-cover rounded-lg shadow-md flex-shrink-0"
+                    onError={(e) => {
+                      e.target.src =
+                        "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=150&h=150&fit=crop&crop=center";
+                    }}
+                  />
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-semibold text-gray-800 text-lg mb-1 truncate">
+                      {food.nama}
+                    </h3>
+                    <div className="space-y-2">
+                      <div className="flex items-center gap-2">
+                        <span className="bg-teal-100 text-teal-800 px-2 py-1 rounded-full text-xs font-medium">
+                          {food.kategori}
+                        </span>
+                        <span className="font-semibold text-gray-700 text-sm">
+                          {food.kalori} kal
+                        </span>
+                      </div>
+                      <div className="flex items-center justify-between text-xs text-gray-600">
+                        <span>{food.tanggal_formatted}</span>
+                        <span>{food.waktu}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex flex-col justify-center">
+                    <button
+                      onClick={() => handleDelete(food.id)}
+                      className="bg-red-500 hover:bg-red-600 text-white p-2 rounded-lg transition-colors"
+                      title="Hapus"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+          
+          {foods.length === 0 && !loading && (
+            <div className="bg-white rounded-xl shadow-lg p-8 text-center">
+              <p className="text-gray-500 text-lg">Belum ada data makanan</p>
+              <p className="text-gray-400 text-sm mt-2">
+                Klik "Tambah Makanan" untuk menambah data
+              </p>
+            </div>
+          )}
+        </div>
+
           {/* Tabel */}
-          <div className="bg-white rounded-xl shadow-lg overflow-hidden">
+          <div className="hidden sm:block bg-white rounded-xl shadow-lg overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead className="bg-teal-500 text-white">
                   <tr>
-                    <th className="px-6 py-4 text-left font-semibold">Foto</th>
-                    <th className="px-6 py-4 text-left font-semibold">
-                      Nama Makanan
-                    </th>
-                    <th className="px-6 py-4 text-left font-semibold">
-                      Kategori
-                    </th>
-                    <th className="px-6 py-4 text-left font-semibold">
-                      Kalori
-                    </th>
-                    <th className="px-6 py-4 text-left font-semibold">
-                      Tanggal
-                    </th>
-                    <th className="px-6 py-4 text-left font-semibold">Waktu</th>
-                    <th className="px-6 py-4 text-center font-semibold">
-                      Aksi
+                      <th className="px-4 lg:px-6 py-4 text-left font-semibold text-sm lg:text-base">Foto</th>
+                      <th className="px-4 lg:px-6 py-4 text-left font-semibold text-sm lg:text-base">
+                        Nama Makanan
+                      </th>
+                      <th className="px-4 lg:px-6 py-4 text-left font-semibold text-sm lg:text-base">
+                        Kategori
+                      </th>
+                      <th className="px-4 lg:px-6 py-4 text-left font-semibold text-sm lg:text-base">
+                        Kalori
+                      </th>
+                      <th className="px-4 lg:px-6 py-4 text-left font-semibold text-sm lg:text-base">
+                        Tanggal
+                      </th>
+                      <th className="px-4 lg:px-6 py-4 text-left font-semibold text-sm lg:text-base">Waktu</th>
+                      <th className="px-4 lg:px-6 py-4 text-center font-semibold text-sm lg:text-base">
                     </th>
                   </tr>
                 </thead>
@@ -188,43 +248,43 @@ export default function MakananView() {
                         index % 2 === 0 ? "bg-gray-50" : "bg-white"
                       } hover:bg-teal-50 transition-colors`}
                     >
-                      <td className="px-6 py-4">
+                      <td className="px-4 lg:px-6 py-4">
                         <img
                           src={food.foto}
                           alt={food.nama}
-                          className="w-16 h-16 object-cover rounded-lg shadow-md"
+                          className="w-12 h-12 lg:w-16 lg:h-16 object-cover rounded-lg shadow-md"
                           onError={(e) => {
                             e.target.src =
                               "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=150&h=150&fit=crop&crop=center";
                           }}
                         />
                       </td>
-                      <td className="px-6 py-4">
+                      <td className="px-4 lg:px-6 py-4">
                         <div className="font-semibold text-gray-800">
                           {food.nama}
                         </div>
                       </td>
-                      <td className="px-6 py-4">
+                      <td className="px-4 lg:px-6 py-4">
                         <span className="bg-teal-100 text-teal-800 px-3 py-1 rounded-full text-sm font-medium">
                           {food.kategori}
                         </span>
                       </td>
-                      <td className="px-6 py-4">
+                      <td className="px-4 lg:px-6 py-4">
                         <span className="font-semibold text-gray-700">
                           {food.kalori} kal
                         </span>
                       </td>
-                      <td className="px-6 py-4">
+                      <td className="px-4 lg:px-6 py-4">
                         <span className="text-sm text-gray-600">
                           {food.tanggal_formatted}
                         </span>
                       </td>
-                      <td className="px-6 py-4">
+                      <td className="px-4 lg:px-6 py-4">
                         <span className="text-sm text-gray-600">
                           {food.waktu}
                         </span>
                       </td>
-                      <td className="px-6 py-4">
+                      <td className="px-4 lg:px-6 py-4">
                         <div className="flex justify-center gap-2">
                           <button
                             onClick={() => handleDelete(food.id)}

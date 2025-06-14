@@ -111,7 +111,7 @@ const LoginView = ({ onSwitchToRegister }) => {
           </p>
         </div>
 
-        <form className="space-y-6" onSubmit={handleLogin}>
+        <form className="space-y-6 text-black" onSubmit={handleLogin}>
           {/* Email */}
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">

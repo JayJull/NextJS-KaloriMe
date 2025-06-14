@@ -106,7 +106,7 @@ const RegisterView = ({ onSwitchToLogin, onClose }) => {
       setLoading(false);
     }
   };
-  
+
   return (
     <div className="w-full">
       {/* Header */}
@@ -138,7 +138,7 @@ const RegisterView = ({ onSwitchToLogin, onClose }) => {
         </div>
       )}
 
-      <form className="space-y-4" onSubmit={handleSubmit}>
+      <form className="space-y-4 text-black" onSubmit={handleSubmit}>
         {/* Name Field */}
         <div>
           <label

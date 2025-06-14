@@ -287,7 +287,7 @@ const avatarSmall = session?.user?.image ? (
                     </button>
 
                     {/* Avatar */}
-                    <div className="mx-auto w-12 sm:w-14 h-12 sm:h-14 lg:w-20 lg:h-20 rounded-full text-white flex items-center justify-center text-xl font-medium mb-2 relative">
+                    <div className="mx-auto sm:w-14 sm:h-14 lg:w-20 lg:h-20 rounded-full text-white flex items-center justify-center text-xl font-medium mb-2 relative">
                       {avatarLarge}
                     </div>
 

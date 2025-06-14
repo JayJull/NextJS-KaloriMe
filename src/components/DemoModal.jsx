@@ -30,7 +30,7 @@ export default function DemoModal() {
             </button>
             <iframe
                 className="w-full h-full rounded-lg shadow-lg"
-                src="https://www.youtube.com/embed/WIjJyiY4850"
+                src="https://www.youtube.com/embed/DodyRF8dVck"
                 title="Demo KaloriME"
                 frameBorder="0"
                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"

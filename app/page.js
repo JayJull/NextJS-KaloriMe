@@ -2,13 +2,14 @@
 import Image from "next/image";
 import LandingTabs from "@/components/LandingTabs";
 import { MdRestaurant, MdSearch, MdEco } from "react-icons/md";
-import { FaArrowUp, FaFacebook, FaInstagram, FaTwitter } from "react-icons/fa";
+import { Facebook, Instagram, Twitter, ArrowUp } from 'lucide-react';
 import { useState, useRef, useEffect } from "react";
 import LoginModal from "@/views/login/LoginModal";
 import RegisterModal from "@/views/register/RegisterModal";
 import dynamic from "next/dynamic";
 import { AnimatePresence } from "framer-motion";
 import DemoModal from '@/components/DemoModal';
+import { motion } from "framer-motion";
 
 export default function Home() {
   const [showLogin, setShowLogin] = useState(false);
@@ -21,7 +22,7 @@ export default function Home() {
   const tentangkamiRef = useRef(null);
   const [showButton, setShowButton] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-
+  
   const DynamicMap = dynamic(() => import("../src/components/MapComponent"), {
     ssr: false,
   });
@@ -282,7 +283,7 @@ export default function Home() {
         </nav>
 
         {/* Hero Section */}
-        <section
+        <motion.section
           id="beranda"
           ref={berandaRef}
           className="relative overflow-hidden min-h-[55vh] sm:min-h-[70vh] md:min-h-[70vh] lg:min-h-screen flex items-center px-4 sm:px-6 md:px-8 lg:px-12 py-8 sm:py-12 md:py-16 lg:py-20"
@@ -290,17 +291,21 @@ export default function Home() {
             backgroundColor: "#00A999",
             backgroundImage: "url('/images/grey-felt-texture.jpg')",
           }}
+          initial={{ opacity: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1 }}
+          viewport={{ once: true }}
         >
           <div className="absolute inset-0 bg-[#00A999]/95"></div>
 
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 md:py-10 lg:px-8 w-full relative z-10">
-            <div className="flex justify-center items-center -mt-50">
-              <div className="text-white text-center w-full">
-                <h1 className="text-md mt-45 sm:mt-25 text-2xl mb-1 md:text-4xl mt-8 lg:text-5xl font-bold leading-tight mb-3">
-                  Buat Perjalanan Sehatmu
-                  <span className="block text">Lebih Mudah dan Fun!</span>
-                </h1>
-                <p className="text-sm font-normal mb-8 leading-relaxed mx-auto max-w-2xl sm:text-md max-w-md md:max-w-2xl lg:text-2xl xl:max-w-4xl">
+          <div className="max-w-7xl mx-auto w-full relative z-10">
+          <div className="flex justify-center items-center">
+            <div className="text-white text-center w-full max-w-5xl mt-[-10%] md:mt-[-15%]">
+              <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl 2xl:text-6xl font-bold leading-tight mb-4 sm:mb-5 md:mb-6 lg:mb-8">
+                Buat Perjalanan Sehatmu
+                <span className="block">Lebih Mudah dan Fun!</span>
+              </h1>
+              <p className="text-sm sm:text-base md:text-lg lg:text-xl xl:text-2xl font-normal leading-relaxed mx-auto max-w-xs sm:max-w-md md:max-w-2xl lg:max-w-3xl xl:max-w-4xl mb-8 sm:mb-10 md:mb-12 lg:mb-16">
                   Dari tracking kalori hingga konsultasi dengan ahli gizi
                   langsung yang cocok untuk kamu semua jadi lebih mudah dengan
                   teknologi AI yang canggih!
@@ -325,43 +330,31 @@ export default function Home() {
 
           {/* Floating Images */}
           <div className="absolute inset-0 pointer-events-none">
-            {/* Left Side Images */}
-            <div className="absolute left-5 top-0 sm:left-5 top-0 md:left-10 top-0 lg:left-10 top-[220] xl:left-35 top-70">
-              <div className="relative w-[80] h-[80] sm:w-[100] sm:h-[90] md:w-[110] md:h-[100] lg:w-[160] lg:h-[160] xl:w-[180] xl:h-[180]">
-                <Image
-                  src="/images/pisang.png"
-                  alt="Pisang"
-                  fill
-                  className="drop-shadow-lg"
-                />
+        
+            {/* 🍌 Pisang Kiri Tengah */}
+            <div className="absolute top-[40%] md:top-[27%] left-[2%] sm:left-[4%] md:left-[6%] lg:left-[8%] xl:left-[5%]">
+              <div className="relative w-[80px] sm:w-[100px] md:w-[120px] lg:w-[160px] xl:w-[180px] aspect-[3/4]">
+                <Image src="/images/pisang.png" alt="Pisang" fill />
               </div>
             </div>
 
-            <div className="absolute top-[85px] left-0 sm:left-5 top-0 md:left-20 top-0 lg:left-35 top-10 xl:left-50 top-20">
-              <div className="relative w-[60] h-[60] sm:w-[70] sm:h-[70] md:w-[80] md:h-[80] lg:w-[90] lg:h-[90] xl:w-[100] xl:h-[100]">
-                <Image
-                  src="/images/straw.png"
-                  alt="stroberi"
-                  fill
-                  className="drop-shadow-lg"
-                />
+            {/* 🍓 Stroberi Kiri Atas */}
+            <div className="absolute top-[16%] md:top-[13%] left-[5%] sm:left-[7%] md:left-[8%] lg:left-[10%] xl:left-[15%]">
+              <div className="relative w-[60px] sm:w-[70px] md:w-[80px] lg:w-[90px] xl:w-[100px] aspect-square">
+                <Image src="/images/straw.png" alt="Strawberry" fill className="drop-shadow-lg"/>
               </div>
             </div>
 
-            <div className="absolute right-66 top-[275px] sm:right-110 top-81 md:right-135 top-74 lg:top-[392px] lg:left-[-100px] xl:left-[-100px] xl:top-[420px]">
-              <div className="relative w-[150] h-[100] sm:w-[250] sm:h-[165] md:w-[300] md:h-[200] lg:w-[480] lg:h-[320] xl:w-[600px] xl:h-[400px]">
-                <div className="absolute"></div>
-                <Image
-                  src="/images/54999735_9329466.png"
-                  alt="Fresh Vegetables"
-                  fill
-                  className="relative z-10 drop-shadow-lg"
-                />
+            {/* 🥬 Sayur Background Kiri Bawah */}
+            <div className="absolute bottom-[-2%] sm:bottom-[-3%] md:bottom-[-2%] lg:bottom-[-4%] xl:bottom-[-5%] left-[-12%] sm:left-[-5%] lg:left-[-10%] xl:left-[-7%]">
+              <div className="relative w-[150px] sm:w-[250px] md:w-[300px] lg:w-[480px] xl:w-[600px] aspect-[3/2]">
+                <Image src="/images/54999735_9329466.png" alt="Vegetable Side" fill className="relative z-10 drop-shadow-lg"/>
               </div>
             </div>
 
-            <div className="absolute right-14 sm:right-30 md:right-28 lg:right-65 xl:right-85 top-67 sm:top-75 md:top-[280px] lg:top-[380px] xl:top-[420px]">
-              <div className="relative w-[260px] h-[126px] sm:w-[400px] sm:h-[180px] md:w-[550px] md:h-[248px] lg:w-[700px] lg:h-[315px] xl:w-[850px] xl:h-[382px]">
+            {/* 🥗 Gambar Utama (Tengah) */}
+            <div className="absolute bottom-[-5%] left-1/2 transform -translate-x-1/2 w-full px-4 sm:px-8">
+              <div className="relative mx-auto w-full max-w-[300px] sm:max-w-[500px] md:max-w-[600px] lg:max-w-[800px] xl:max-w-[850px] aspect-[850/382]">
                 <Image
                   src="/images/405493453_b83b297c-be8b-4cb8-b0cc-f79bdddbe6abf.png"
                   alt="Fresh Vegetables Main"
@@ -369,47 +362,43 @@ export default function Home() {
                   className="object-contain"
                   style={{
                     filter:
-                      "drop-shadow(0px 4px 12px rgba(0, 0, 0, 0.2)) drop-shadow(0px 8px 20px rgba(0, 0, 0, 0.3))",
+                      'drop-shadow(0px 4px 12px rgba(0, 0, 0, 0.2)) drop-shadow(0px 8px 20px rgba(0, 0, 0, 0.3))',
                   }}
                 />
               </div>
             </div>
 
-            {/* Right Side Images */}
-            <div className="absolute right-1 top-0 sm:right-1 top-0 md:right-2 top-35 lg:right-10 top-35 xl:right-15 top-40 ">
-              <div className="relative w-[75] h-[75] sm:w-[90] sm:h-[90] md:w-[110] md:h-[110] lg:w-[130] lg:h-[130] xl:w-[150] xl:h-[150]">
-                <Image
-                  src="/images/straw.png"
-                  alt="stroberi"
-                  fill
-                  className="drop-shadow-lg"
-                />
+            {/* 🍓 Stroberi Kanan Atas */}
+            <div className="absolute top-[20%] right-[10%] sm:right-[7%] md:right-[8%] lg:right-[10%] xl:right-[10%]">
+              <div className="relative w-[75px] sm:w-[90px] md:w-[110px] lg:w-[130px] xl:w-[150px] aspect-square">
+                <Image src="/images/straw.png" alt="Strawberry" fill className="drop-shadow-lg"/>
               </div>
             </div>
 
-            <div className="absolute right-0 bottom-0 sm:right-5 bottom-[50px] md:right-2 bottom-[25px] lg:right-10 bottom-0 xl:right-15 bottom-20">
-              <div className="relative w-[100] h-[100] sm:w-[150] sm:h-[150] md:w-[180] md:h-[180] lg:w-[270] lg:h-[270] xl:w-[300] xl:h-[300]">
-                <Image
-                  src="/images/kiwi.png"
-                  alt="kiwi"
-                  fill
-                  className="drop-shadow-lg"
-                />
+            {/* 🥝 Kiwi Kanan Bawah */}
+            <div className="absolute bottom-[15%] md:bottom-[10%] right-[0%] sm:right-[2%] md:right-[0%] lg:right-[2%] xl:right-[3%]">
+              <div className="relative w-[100px] sm:w-[150px] md:w-[180px] lg:w-[250px] xl:w-[300px] aspect-[4/4]">
+                <Image src="/images/kiwi.png" alt="Kiwi" fill  className="drop-shadow-lg"/>
               </div>
             </div>
+
           </div>
           <LoginModal isOpen={showLogin} onClose={() => setShowLogin(false)} />
           <RegisterModal
             isOpen={showRegister}
             onClose={() => setShowRegister(false)}
           />
-        </section>
+        </motion.section>
 
         {/* Isi Konten 1 */}
-        <section
+        <motion.section
           id="programdiet"
           ref={programdietRef}
           className="py-8 sm:py-12 md:py-16 lg:py-20 bg-white text-center px-4 sm:px-6 md:px-8 lg:px-12"
+          initial={{ opacity: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1 }}
+          viewport={{ once: true }}
         >
           <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-red-600 mb-3 sm:mb-4 md:mb-6 tracking-tight leading-tight">
             Temukan KaloriME
@@ -425,10 +414,10 @@ export default function Home() {
           <div className="w-full max-w-7xl mx-auto">
             <LandingTabs />
           </div>
-        </section>
+        </motion.section>
 
         {/* Isi Konten 2 */}
-        <section
+        <motion.section
           id="carakerja"
           ref={carakerjaRef}
           className="relative overflow-hidden min-h-[35vh] sm:min-h-[80vh] md:min-h-[90vh] lg:min-h-screen flex items-center px-4 sm:px-6 md:px-8 lg:px-12 py-8 sm:py-12 md:py-16 lg:py-20  rounded-4xl"
@@ -440,6 +429,10 @@ export default function Home() {
             backgroundRepeat: "no-repeat",
             backgroundAttachment: "scroll",
           }}
+          initial={{ opacity: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1 }}
+          viewport={{ once: true }}
         >
           <div className="absolute inset-0 bg-black/40 sm:bg-black/45 md:bg-black/50 z-20"></div>
           <div className="absolute inset-0 bg-[#A6A6A6]/40 sm:bg-[#A6A6A6]/45 md:bg-[#A6A6A6]/50 z-10"></div>
@@ -467,7 +460,7 @@ export default function Home() {
           </div>
 
           <div className="relative w-full flex justify-center z-30 px-4 sm:px-6 md:px-8 lg:px-10">
-            <div className="relative w-full max-w-[200px] h-[300px] sm:max-w-[700px] sm:h-[608px] md:max-w-[800px] md:h-[600px] lg:max-w-[850px] lg:h-[680px] xl:max-w-[1000px] xl:h-[850px]">
+            <div className="relative w-full max-w-[300px] h-[500px] sm:max-w-[700px] sm:h-[608px] md:max-w-[800px] md:h-[600px] lg:max-w-[850px] lg:h-[680px] xl:max-w-[1000px] xl:h-[850px]">
               <Image
                 src="/images/Group 9.png"
                 alt="cara kerja"
@@ -483,14 +476,18 @@ export default function Home() {
               />
             </div>
           </div>
-        </section>
+        </motion.section>
 
         {/* Isi konten 3 */}
         {/* Tentang Kami Section */}
-        <section
+        <motion.section
           id="tentangkami"
           ref={tentangkamiRef}
           className="bg-white grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 md:gap-10 items-center px-4 sm:px-6 md:px-8 lg:px-12 py-8 sm:py-12 md:py-16"
+          initial={{ opacity: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1 }}
+          viewport={{ once: true }}
         >
           {/* Image */}
           <div className="flex justify-center order-1 lg:order-1">
@@ -521,13 +518,18 @@ export default function Home() {
               sehat yang lebih mudah, efektif, dan menyenangkan.
             </p>
           </div>
-        </section>
+        </motion.section>
 
         {/* Divider */}
         <hr className="border-t-2 border-teal-400 w-4/5 sm:w-5/6 mx-auto drop-shadow-lg my-6 sm:my-8 md:my-10" />
 
         {/* Fitur Unggulan Section */}
-        <section className="flex flex-col lg:flex-row items-center justify-center gap-8 sm:gap-12 md:gap-16 lg:gap-20 px-4 sm:px-6 md:px-8 lg:px-12 py-8 sm:py-12 md:py-16">
+        <motion.section className="flex flex-col lg:flex-row items-center justify-center gap-8 sm:gap-12 md:gap-16 lg:gap-20 px-4 sm:px-6 md:px-8 lg:px-12 py-8 sm:py-12 md:py-16"
+          initial={{ opacity: 0, y: 50 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1 }}
+          viewport={{ once: true }}
+        >
           {/* Kiri - Fitur Unggulan */}
           <div className="text-center lg:text-left max-w-md lg:max-w-none">
             <h2 className="text-red-600 text-2xl sm:text-3xl md:text-4xl font-bold mb-4 sm:mb-6">
@@ -589,98 +591,147 @@ export default function Home() {
               </div>
             </div>
           </div>
-        </section>
+        </motion.section>
 
         {/* Footer */}
-        <footer className="bg-black text-white py-10 px-6">
-          <div className="max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-10">
-            {/* Logo dan Sosial Media */}
-            <div className="flex flex-col items-center justify-start space-y-5">
-              {/* Logo Placeholder */}
-              <Image
-                src="/images/KaloriME2.png"
-                alt="Logo KaloriME"
-                width={250}
-                height={250}
-              />
-
-              {/* Icon Media Sosial */}
-              <div className="flex space-x-4 mt-2 text-white text-2xl">
-                <a href="#">
-                  <i className="fab fa-facebook-f text-xl"></i>
-                  <FaFacebook />
-                </a>
-                <a href="#">
-                  <i className="fab fa-instagram text-xl"></i>
-                  <FaInstagram />
-                </a>
-                <a href="#">
-                  <i className="fab fa-x-twitter text-xl"></i>
-                  <FaTwitter />
-                </a>
+        <footer className="bg-gray-900 text-white">
+          {/* Main Footer Content */}
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 lg:py-12">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+              
+              {/* Logo dan Sosial Media */}
+              <div className="col-span-1 sm:col-span-2 lg:col-span-1">
+                <div className="mb-6">
+                  {/* Logo */}
+                  <div className="flex items-center mb-4 ml-[-30]">
+                    <Image
+                    src="/images/KaloriME2.png"
+                    alt="Logo KaloriME"
+                    width={250}
+                    height={250}
+                  />
+                  </div>
+                  
+                  {/* Deskripsi Singkat */}
+                  <p className="text-gray-300 text-sm mb-6 max-w-xs">
+                    Platform diet sehat dan gaya hidup yang membantu Anda mencapai berat badan ideal dengan mudah.
+                  </p>
+                  
+                  {/* Social Media Icons */}
+                  <div className="flex space-x-4">
+                    <a href="#" className="w-10 h-10 bg-gray-800 hover:bg-blue-600 rounded-full flex items-center justify-center transition-colors duration-300">
+                      <Facebook size={18} />
+                    </a>
+                    <a href="#" className="w-10 h-10 bg-gray-800 hover:bg-pink-600 rounded-full flex items-center justify-center transition-colors duration-300">
+                      <Instagram size={18} />
+                    </a>
+                    <a href="#" className="w-10 h-10 bg-gray-800 hover:bg-blue-400 rounded-full flex items-center justify-center transition-colors duration-300">
+                      <Twitter size={18} />
+                    </a>
+                  </div>
+                </div>
               </div>
-            </div>
 
-            {/* Layanan */}
-            <div className="mx-auto w-fit">
-              <h4 className="text-xl font-semibold mb-3">Layanan</h4>
-              <ul className="space-y-2 text-lg text-gray-300">
-                <li>
-                  <a href="#">FAQ</a>
-                </li>
-                <li>
-                  <a href="#">Contact US</a>
-                </li>
-                <li>
-                  <a href="#">Privacy</a>
-                </li>
-                <li>
-                  <a href="#">Terms Of Use</a>
-                </li>
-              </ul>
-            </div>
-
-            {/* Tautan Cepat */}
-            <div className="mx-auto w-fit">
-              <h4 className="text-xl font-semibold mb-3">Tautan Cepat</h4>
-              <ul className="space-y-2 text-lg text-gray-300">
-                <li>
-                  <button onClick={() => scrollToSection(berandaRef)}>
-                    Beranda
-                  </button>
-                </li>
-                <li>
-                  <button onClick={() => scrollToSection(programdietRef)}>
-                    Progam Diet
-                  </button>
-                </li>
-                <li>
-                  <button onClick={() => scrollToSection(carakerjaRef)}>
-                    Cara Kerja
-                  </button>
-                </li>
-                <li>
-                  <button onClick={() => scrollToSection(tentangkamiRef)}>
-                    Tentang Kami
-                  </button>
-                </li>
-              </ul>
-            </div>
-
-            {/* Map */}
-            <div className="mx-auto w-fit mb-10">
-              <h4 className="text-xl font-semibold mb-3">Lokasi</h4>
+              <div className="col-span-1 sm:col-span-2 lg:col-span-2">
+            <div className="grid grid-cols-2 gap-4 sm:gap-8">
+              {/* Layanan */}
               <div>
-                <DynamicMap />
-                <h2 className="text-lg my-5 font-medium"></h2>
+                <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-white">Layanan</h3>
+                <ul className="space-y-2 sm:space-y-3">
+                  <li>
+                    <a href="#" className="text-gray-300 hover:text-white transition-colors duration-300 text-xs sm:text-sm">
+                      FAQ
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#" className="text-gray-300 hover:text-white transition-colors duration-300 text-xs sm:text-sm">
+                      Contact Us
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#" className="text-gray-300 hover:text-white transition-colors duration-300 text-xs sm:text-sm">
+                      Privacy Policy
+                    </a>
+                  </li>
+                  <li>
+                    <a href="#" className="text-gray-300 hover:text-white transition-colors duration-300 text-xs sm:text-sm">
+                      Terms of Use
+                    </a>
+                  </li>
+                </ul>
+              </div>
+
+              {/* Tautan Cepat */}
+              <div>
+                <h3 className="text-base sm:text-lg font-semibold mb-3 sm:mb-4 text-white">Tautan Cepat</h3>
+                <ul className="space-y-2 sm:space-y-3">
+                  <li>
+                    <button 
+                      onClick={() => scrollToSection('berandaRef')}
+                      className="text-gray-300 hover:text-white transition-colors duration-300 text-xs sm:text-sm text-left"
+                    >
+                      Beranda
+                    </button>
+                  </li>
+                  <li>
+                    <button 
+                      onClick={() => scrollToSection('programdietRef')}
+                      className="text-gray-300 hover:text-white transition-colors duration-300 text-xs sm:text-sm text-left"
+                    >
+                      Program Diet
+                    </button>
+                  </li>
+                  <li>
+                    <button 
+                      onClick={() => scrollToSection('carakerjaRef')}
+                      className="text-gray-300 hover:text-white transition-colors duration-300 text-xs sm:text-sm text-left"
+                    >
+                      Cara Kerja
+                    </button>
+                  </li>
+                  <li>
+                    <button 
+                      onClick={() => scrollToSection('tentangkamiRef')}
+                      className="text-gray-300 hover:text-white transition-colors duration-300 text-xs sm:text-sm text-left"
+                    >
+                      Tentang Kami
+                    </button>
+                  </li>
+                </ul>
               </div>
             </div>
           </div>
 
-          <hr className="my-10 border-white" />
+          {/* Lokasi */}
+          <div className="col-span-1 sm:col-span-2 lg:col-span-1">
+            <h4 className="text-xl font-semibold mb-3">Lokasi</h4>
+              <div>
+                <DynamicMap />
+                <h2 className="text-lg my-5 font-medium"></h2>
+              </div>
+          </div>
+        </div>
+      </div>
 
-          <div className="text-center text-lg text-white">© 2025 KaloriME.</div>
-        </footer>
+      {/* Bottom Bar */}
+      <div className="border-t border-gray-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="py-4 flex flex-col sm:flex-row justify-between items-center">
+            <div className="text-gray-400 text-sm mb-2 sm:mb-0">
+              © 2025 KaloriME. All rights reserved.
+            </div>
+            <div className="flex space-x-6 text-sm">
+              <a href="#" className="text-gray-400 hover:text-white transition-colors duration-300">
+                Kebijakan Privasi
+              </a>
+              <a href="#" className="text-gray-400 hover:text-white transition-colors duration-300">
+                Syarat & Ketentuan
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </footer>
 
         {/* button back to top */}
         {showButton && (
@@ -688,7 +739,7 @@ export default function Home() {
             onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
             className="fixed bottom-6 right-6 bg-teal-500 text-white px-6 py-6 rounded-full shadow-lg z-[9999] drop-shadow-lg hover: transition"
           >
-            <FaArrowUp size={20} />
+            <ArrowUp size={20} />
           </button>
         )}
       </div>
