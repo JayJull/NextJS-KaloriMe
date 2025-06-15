@@ -17,7 +17,7 @@ const contents = {
     description: `Wujudkan tubuh ideal tanpa repot.
 Gunakan fitur pencarian kami untuk mengetahui kandungan kalori dan gizi dari lebih dari 100 makanan—mulai dari masakan rumahan, produk kemasan, hingga menu restoran.
 Ambil keputusan makan yang lebih cerdas setiap hari dan tetap terarah dalam perjalanan menuju tubuh sehat dan ideal.`,
-    image: "/images/man-eating-dragon-fruit-outdoors.jpg",
+    image: "/images/man-eating-dragon-fruit-outdoors.webp",
   },
 
   kandungan: {
@@ -26,7 +26,7 @@ Ambil keputusan makan yang lebih cerdas setiap hari dan tetap terarah dalam perj
     description: `Ingin tahu apa yang Anda makan?
 Fitur pencarian kami memudahkan Anda menemukan informasi kalori dan nutrisi dari berbagai jenis makanan—mulai dari makanan sehari-hari, camilan kemasan, hingga hidangan restoran favorit.
 Data yang telah diverifikasi membantu Anda membuat pilihan makan yang lebih cerdas dan sehat setiap hari. Temukan kandungan makanan Anda dengan mudah, dan dukung gaya hidup sehat yang lebih terarah.`,
-    image: "/images/5703146_59473.jpg",
+    image: "/images/5703146_59473.webp",
   },
 
   nutrisi: {
@@ -34,7 +34,7 @@ Data yang telah diverifikasi membantu Anda membuat pilihan makan yang lebih cerd
     subtitle: "Nutrisi Harian",
     description: `Setiap hari, tubuh Anda membutuhkan asupan yang tepat untuk tetap aktif, fokus, dan sehat. Fitur Nutrisi Harian membantu Anda memantau kebutuhan kalori, makronutrien, dan gizi penting lainnya yang sesuai dengan gaya hidup Anda.
 Tak perlu lagi menebak apa yang Anda makan—ketahui kandungan gizi dari berbagai jenis makanan dan jaga keseimbangan nutrisi setiap hari. Mulai hari ini, jadikan nutrisi sebagai bagian dari rutinitas cerdas Anda.`,
-    image: "/images/1531149_4105.jpg",
+    image: "/images/1531149_4105.webp",
   },
 };
 
@@ -53,8 +53,8 @@ export default function LandingTabs() {
             onClick={() => setSelectedTab(tab.key)}
             className={`border-2 px-3 sm:px-4 md:px-6 py-1.5 sm:py-2 rounded-full font-semibold transition-all text-sm sm:text-base ${
               selectedTab === tab.key
-                ? "text-teal-600 border-teal-500"
-                : "text-gray-500 border-gray-300 hover:border-teal-400 hover:text-teal-500"
+                ? "text-teal-800 border-teal-700"
+                : "text-gray-500 border-gray-300 hover:border-teal-600 hover:text-teal-700"
             }`}
           >
             {tab.label}
@@ -74,9 +74,9 @@ export default function LandingTabs() {
         >
           {/* Text Content */}
           <div className="text-left order-2 lg:order-1">
-            <h4 className="text-teal-500 text-base sm:text-lg md:text-xl font-semibold mb-2">
+            <h3 className="text-teal-700 text-base sm:text-lg md:text-xl font-semibold mb-2">
               {current.subtitle}
-            </h4>
+            </h3>
             <h2 className="text-black text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold mb-3 sm:mb-4 leading-tight">
               {current.title}
             </h2>

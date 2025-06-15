@@ -13,7 +13,7 @@ L.Icon.Default.mergeOptions({
 
 export default function MapComponent() {
   return (
-     <div className="h-[150px] w-[200px] sm:h-[200px] sm:w-[320px] md:h-[120px] md:w-[150px] lg:h-[150px] lg:w-[200px] xl:h-[250px] xl:w-[300px] mx-auto rounded-lg overflow-hidden shadow-md">
+     <div className="w-full h-40 bg-gray-800 rounded-lg flex items-center justify-center">
       <MapContainer 
         center={[-8.325394, 114.335867]} 
         zoom={13} 

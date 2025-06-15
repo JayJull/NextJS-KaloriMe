@@ -6,9 +6,9 @@ import { format } from 'date-fns'
 import { id } from 'date-fns/locale'
 import 'react-datepicker/dist/react-datepicker.css'
 import Image from 'next/image'
-import { useSession } from "next-auth/react"
 import { useRouter } from 'next/navigation'
-import { signOut } from 'next-auth/react'
+import React from 'react';
+import { signOut, useSession } from 'next-auth/react'
 
 export default function Header({ title, subtitle }) {
   const [searchQuery, setSearchQuery] = useState('')
@@ -17,7 +17,7 @@ export default function Header({ title, subtitle }) {
   const [open, setOpen] = useState(false)
   const [showMobileSearch, setShowMobileSearch] = useState(false)
   const [showMobileMenu, setShowMobileMenu] = useState(false)
-  const { data: session } = useSession()
+  const { data: session, status } = useSession()
   const dropdownRef = useRef(null)
   const router = useRouter()
 
@@ -77,8 +77,25 @@ const avatarSmall = session?.user?.image ? (
   )
 
   const user = {
-    name: session?.user?.name || "Guest",
+    name: session?.user?.nama || "Guest",
     email: session?.user?.email || "guest@example.com",
+  }
+
+ async function logout() {
+    try {
+      const res = await fetch('/api/logout', {
+        method: 'POST',
+        credentials: 'include',   // PENTING! agar cookie dikirim
+      });
+      if (res.ok) {
+        router.push('/');
+      } else {
+        const data = await res.json();
+        console.error('Logout failed:', data);
+      }
+    } catch (error) {
+      console.error('Logout error:', error);
+    }
   }
 
   return (
@@ -252,7 +269,7 @@ const avatarSmall = session?.user?.image ? (
                   {avatarSmall}
                 </div>
                 <div className="text-gray-600 font-semibold text-xs sm:text-sm truncate max-w-20 sm:max-w-32 md:max-w-none hidden sm:block lg:block">
-                  {user.name}
+                  {session?.user?.name}
                 </div>
                 <ChevronDown size={16} className="text-gray-500 hidden sm:block" />
               </button>
@@ -270,13 +287,13 @@ const avatarSmall = session?.user?.image ? (
                     </button>
 
                     {/* Avatar */}
-                    <div className="mx-auto w-12 sm:w-14 h-12 sm:h-14 lg:w-20 lg:h-20 rounded-full text-white flex items-center justify-center text-xl font-medium mb-2 relative">
+                    <div className="mx-auto sm:w-14 sm:h-14 lg:w-20 lg:h-20 rounded-full text-white flex items-center justify-center text-xl font-medium mb-2 relative">
                       {avatarLarge}
                     </div>
 
                     {/* User Info */}
                     <div className="text-base sm:text-lg text-gray-900 font-semibold truncate px-4">
-                      {user.name}
+                      {session?.user?.name}
                     </div>
                     <div className="text-xs sm:text-sm text-gray-600 mt-1 truncate px-4">
                       {user.email}

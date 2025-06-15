@@ -112,7 +112,7 @@ const RegisterView = ({ onSwitchToLogin, onClose }) => {
       {/* Header */}
       <div className="flex flex-col items-center space-y-2 mb-6">
         <Image
-          src="/images/KaloriME2.png"
+          src="/images/KaloriME2.webp"
           alt="Logo KaloriME"
           width={150}
           height={150}
@@ -138,7 +138,7 @@ const RegisterView = ({ onSwitchToLogin, onClose }) => {
         </div>
       )}
 
-      <form className="space-y-4" onSubmit={handleSubmit}>
+      <form className="space-y-4 text-black" onSubmit={handleSubmit}>
         {/* Name Field */}
         <div>
           <label

@@ -97,12 +97,10 @@ const LoginView = ({ onSwitchToRegister }) => {
 
   return (
     <>
-      {/* Kontainer utama */}
       <div className="w-full max-w-md bg-white rounded-xl overflow-hidden p-8">
-        {/* Logo */}
         <div className="flex flex-col items-center space-y-4 mb-8">
           <Image
-            src="/images/KaloriME2.png"
+            src="/images/KaloriME2.webp"
             alt="logo KaloriME"
             width={200}
             height={200}
@@ -113,7 +111,7 @@ const LoginView = ({ onSwitchToRegister }) => {
           </p>
         </div>
 
-        <form className="space-y-6" onSubmit={handleLogin}>
+        <form className="space-y-6 text-black" onSubmit={handleLogin}>
           {/* Email */}
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
@@ -140,7 +138,6 @@ const LoginView = ({ onSwitchToRegister }) => {
             )}
           </div>
 
-          {/* Password */}
           <div className="relative">
             <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
               <FiLock className="text-gray-600" />
@@ -175,7 +172,6 @@ const LoginView = ({ onSwitchToRegister }) => {
             </div>
           )}
 
-          {/* Remember me + lupa password */}
           <div className="flex items-center justify-between">
             <div className="flex items-center">
               <input
@@ -203,7 +199,6 @@ const LoginView = ({ onSwitchToRegister }) => {
             </button>
           </div>
 
-          {/* Tombol masuk */}
           <button
             type="submit"
             disabled={
@@ -229,7 +224,6 @@ const LoginView = ({ onSwitchToRegister }) => {
           </button>
         </form>
 
-        {/* Link daftar */}
         <div className="mt-6 text-center">
           <p className="text-sm text-gray-600">
             Belum punya akun?{" "}
@@ -261,7 +255,7 @@ const LoginView = ({ onSwitchToRegister }) => {
 
         {/* Login sosial */}
         <div className="mt-6">
-          <div className="grid grid-cols-2 gap-3">
+          <div>
             <button
               type="button"
               className="w-full inline-flex justify-center items-center px-4 py-3 border border-gray-300 rounded-lg bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors duration-200"
@@ -278,7 +272,7 @@ const LoginView = ({ onSwitchToRegister }) => {
         </div>
       </div>
 
-      {/* Modal harus di luar kontainer */}
+      {/* Modal pop-up jika login/register dalam bentuk modal */}
       <AnimatePresence>
         {showLogin && (
           <LoginModal
