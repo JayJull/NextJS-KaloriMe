@@ -100,7 +100,7 @@ const LoginView = ({ onSwitchToRegister }) => {
       <div className="w-full max-w-md bg-white rounded-xl overflow-hidden p-8">
         <div className="flex flex-col items-center space-y-4 mb-8">
           <Image
-            src="/images/KaloriME2.png"
+            src="/images/KaloriME2.webp"
             alt="logo KaloriME"
             width={200}
             height={200}
@@ -255,7 +255,7 @@ const LoginView = ({ onSwitchToRegister }) => {
 
         {/* Login sosial */}
         <div className="mt-6">
-          <div className="grid grid-cols-2 gap-3">
+          <div>
             <button
               type="button"
               className="w-full inline-flex justify-center items-center px-4 py-3 border border-gray-300 rounded-lg bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors duration-200"

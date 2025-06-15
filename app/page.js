@@ -1,15 +1,16 @@
 "use client";
 import Image from "next/image";
-import LandingTabs from "@/components/LandingTabs";
 import { MdRestaurant, MdSearch, MdEco } from "react-icons/md";
-import { Facebook, Instagram, Twitter, ArrowUp } from 'lucide-react';
+import { Facebook, Instagram, Twitter, ArrowUp, } from 'lucide-react';
 import { useState, useRef, useEffect } from "react";
-import LoginModal from "@/views/login/LoginModal";
-import RegisterModal from "@/views/register/RegisterModal";
 import dynamic from "next/dynamic";
 import { AnimatePresence } from "framer-motion";
-import DemoModal from '@/components/DemoModal';
 import { motion } from "framer-motion";
+
+const LoginModal = dynamic(() => import("@/views/login/LoginModal"), { ssr: false });
+const RegisterModal = dynamic(() => import("@/views/register/RegisterModal"), { ssr: false });
+const LandingTabs = dynamic(() => import("@/components/LandingTabs"));
+const DemoModal = dynamic(() => import("@/components/DemoModal"));
 
 export default function Home() {
   const [showLogin, setShowLogin] = useState(false);
@@ -79,7 +80,7 @@ export default function Home() {
           className="fixed top-0 left-0 right-0 z-50"
           style={{
             backgroundColor: "#00A999",
-            backgroundImage: "url('/images/grey-felt-texture.jpg')",
+            backgroundImage: "url('/images/grey-felt-texture.webp')",
           }}
         >
           <div className="absolute inset-0 bg-[#00A999]/95"></div>
@@ -89,11 +90,12 @@ export default function Home() {
               <div className="flex-shrink-0 flex items-center">
                 <div className="">
                   <Image
-                    src="/images/KaloriME Putih.png"
+                    src="/images/KaloriME Putih.webp"
                     alt="KaloriME"
                     width={150}
                     height={150}
                     className="drop-shadow-lg sm:w-[180px] sm:h-[180px] md:w-[200px] md:h-[200px] lg:w-[250px] lg:h-[250px]"
+                    loading="lazy"
                   />
                 </div>
               </div>
@@ -164,6 +166,7 @@ export default function Home() {
                 <button
                   onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                   className="text-white hover:text-gray-200 focus:outline-none p-2"
+                  aria-label={isMobileMenuOpen ? "Tutup menu navigasi" : "Buka menu navigasi"}
                 >
                   <svg
                     className="h-6 w-6"
@@ -283,24 +286,26 @@ export default function Home() {
         </nav>
 
         {/* Hero Section */}
-        <motion.section
+        <section
           id="beranda"
           ref={berandaRef}
           className="relative overflow-hidden min-h-[55vh] sm:min-h-[70vh] md:min-h-[70vh] lg:min-h-screen flex items-center px-4 sm:px-6 md:px-8 lg:px-12 py-8 sm:py-12 md:py-16 lg:py-20"
           style={{
             backgroundColor: "#00A999",
-            backgroundImage: "url('/images/grey-felt-texture.jpg')",
+            backgroundImage: "url('/images/grey-felt-texture.webp')",
           }}
-          initial={{ opacity: 0, y: 50 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1 }}
-          viewport={{ once: true }}
         >
           <div className="absolute inset-0 bg-[#00A999]/95"></div>
-
+          
           <div className="max-w-7xl mx-auto w-full relative z-10">
           <div className="flex justify-center items-center">
-            <div className="text-white text-center w-full max-w-5xl mt-[-10%] md:mt-[-15%]">
+            <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            viewport={{ once: true }}
+            className="text-white text-center w-full max-w-5xl mt-[-10%] md:mt-[-15%]"
+          >
               <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl 2xl:text-6xl font-bold leading-tight mb-4 sm:mb-5 md:mb-6 lg:mb-8">
                 Buat Perjalanan Sehatmu
                 <span className="block">Lebih Mudah dan Fun!</span>
@@ -310,7 +315,7 @@ export default function Home() {
                   langsung yang cocok untuk kamu semua jadi lebih mudah dengan
                   teknologi AI yang canggih!
                 </p>
-              </div>
+              </motion.div>
             </div>
           </div>
 
@@ -329,26 +334,52 @@ export default function Home() {
           </div>
 
           {/* Floating Images */}
-          <div className="absolute inset-0 pointer-events-none">
+          <motion.div 
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            viewport={{ once: true }}
+            className="absolute inset-0 pointer-events-none"
+          >
         
             {/* 🍌 Pisang Kiri Tengah */}
             <div className="absolute top-[40%] md:top-[27%] left-[2%] sm:left-[4%] md:left-[6%] lg:left-[8%] xl:left-[5%]">
               <div className="relative w-[80px] sm:w-[100px] md:w-[120px] lg:w-[160px] xl:w-[180px] aspect-[3/4]">
-                <Image src="/images/pisang.png" alt="Pisang" fill />
+                <Image 
+                  src="/images/pisang.webp" 
+                  alt="Pisang" 
+                  fill 
+                  loading="lazy"
+                  sizes="(max-width: 768px) 80px, 120px"
+                />
               </div>
             </div>
 
             {/* 🍓 Stroberi Kiri Atas */}
             <div className="absolute top-[16%] md:top-[13%] left-[5%] sm:left-[7%] md:left-[8%] lg:left-[10%] xl:left-[15%]">
               <div className="relative w-[60px] sm:w-[70px] md:w-[80px] lg:w-[90px] xl:w-[100px] aspect-square">
-                <Image src="/images/straw.png" alt="Strawberry" fill className="drop-shadow-lg"/>
+                <Image 
+                  src="/images/straw.webp" 
+                  alt="Strawberry" 
+                  fill 
+                  className="drop-shadow-lg" 
+                  loading="lazy"
+                  sizes="(max-width: 768px) 70px, 100px"
+                />
               </div>
             </div>
 
             {/* 🥬 Sayur Background Kiri Bawah */}
             <div className="absolute bottom-[-2%] sm:bottom-[-3%] md:bottom-[-2%] lg:bottom-[-4%] xl:bottom-[-5%] left-[-12%] sm:left-[-5%] lg:left-[-10%] xl:left-[-7%]">
               <div className="relative w-[150px] sm:w-[250px] md:w-[300px] lg:w-[480px] xl:w-[600px] aspect-[3/2]">
-                <Image src="/images/54999735_9329466.png" alt="Vegetable Side" fill className="relative z-10 drop-shadow-lg"/>
+                <Image 
+                  src="/images/54999735_9329466.webp" 
+                  alt="Vegetable Side" 
+                  fill 
+                  className="relative z-10 drop-shadow-lg" 
+                  loading="lazy"
+                  sizes="(max-width: 768px) 250px, 600px"
+                />
               </div>
             </div>
 
@@ -356,14 +387,18 @@ export default function Home() {
             <div className="absolute bottom-[-5%] left-1/2 transform -translate-x-1/2 w-full px-4 sm:px-8">
               <div className="relative mx-auto w-full max-w-[300px] sm:max-w-[500px] md:max-w-[600px] lg:max-w-[800px] xl:max-w-[850px] aspect-[850/382]">
                 <Image
-                  src="/images/405493453_b83b297c-be8b-4cb8-b0cc-f79bdddbe6abf.png"
+                  src="/images/405493453_b83b297c-be8b-4cb8-b0cc-f79bdddbe6abf.webp"
                   alt="Fresh Vegetables Main"
-                  fill
+                  width={850}
+                  height={382}
                   className="object-contain"
+                  priority={true}
+                  loading="eager"
                   style={{
                     filter:
                       'drop-shadow(0px 4px 12px rgba(0, 0, 0, 0.2)) drop-shadow(0px 8px 20px rgba(0, 0, 0, 0.3))',
                   }}
+                  sizes="(max-width: 768px) 100vw, 850px"
                 />
               </div>
             </div>
@@ -371,24 +406,38 @@ export default function Home() {
             {/* 🍓 Stroberi Kanan Atas */}
             <div className="absolute top-[20%] right-[10%] sm:right-[7%] md:right-[8%] lg:right-[10%] xl:right-[10%]">
               <div className="relative w-[75px] sm:w-[90px] md:w-[110px] lg:w-[130px] xl:w-[150px] aspect-square">
-                <Image src="/images/straw.png" alt="Strawberry" fill className="drop-shadow-lg"/>
+                <Image 
+                  src="/images/straw.webp" 
+                  alt="Strawberry" 
+                  fill 
+                  className="drop-shadow-lg" 
+                  loading="lazy"
+                  sizes="(max-width: 768px) 90px, 150px"
+                />
               </div>
             </div>
 
             {/* 🥝 Kiwi Kanan Bawah */}
             <div className="absolute bottom-[15%] md:bottom-[10%] right-[0%] sm:right-[2%] md:right-[0%] lg:right-[2%] xl:right-[3%]">
               <div className="relative w-[100px] sm:w-[150px] md:w-[180px] lg:w-[250px] xl:w-[300px] aspect-[4/4]">
-                <Image src="/images/kiwi.png" alt="Kiwi" fill  className="drop-shadow-lg"/>
+                <Image 
+                  src="/images/kiwi.webp" 
+                  alt="Kiwi" 
+                  fill 
+                  className="drop-shadow-lg" 
+                  loading="lazy"
+                  sizes="(max-width: 768px) 150px, 300px"
+                />
               </div>
             </div>
 
-          </div>
+          </motion.div>
           <LoginModal isOpen={showLogin} onClose={() => setShowLogin(false)} />
           <RegisterModal
             isOpen={showRegister}
             onClose={() => setShowRegister(false)}
           />
-        </motion.section>
+        </section>
 
         {/* Isi Konten 1 */}
         <motion.section
@@ -397,7 +446,7 @@ export default function Home() {
           className="py-8 sm:py-12 md:py-16 lg:py-20 bg-white text-center px-4 sm:px-6 md:px-8 lg:px-12"
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1 }}
+          transition={{ duration: 0.5 }}
           viewport={{ once: true }}
         >
           <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-red-600 mb-3 sm:mb-4 md:mb-6 tracking-tight leading-tight">
@@ -423,7 +472,7 @@ export default function Home() {
           className="relative overflow-hidden min-h-[35vh] sm:min-h-[80vh] md:min-h-[90vh] lg:min-h-screen flex items-center px-4 sm:px-6 md:px-8 lg:px-12 py-8 sm:py-12 md:py-16 lg:py-20  rounded-4xl"
           style={{
             backgroundColor: "#A6A6A6",
-            backgroundImage: "url('/images/gray-textured-wall.jpg')",
+            backgroundImage: "url('/images/gray-textured-wall.webp')",
             backgroundSize: "cover",
             backgroundPosition: "center center",
             backgroundRepeat: "no-repeat",
@@ -431,7 +480,7 @@ export default function Home() {
           }}
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1 }}
+          transition={{ duration: 0.5 }}
           viewport={{ once: true }}
         >
           <div className="absolute inset-0 bg-black/40 sm:bg-black/45 md:bg-black/50 z-20"></div>
@@ -440,10 +489,12 @@ export default function Home() {
           <div className="absolute right-[-105px] sm:right-[-145px] md:right-[-178px] lg:right-[-230px] xl:right-[-285px] top-[5px] sm:top-[-5px] md:top-[-15px] lg:top-[-30px] xl:top-[-40px] z-30">
             <div className="w-[200px] h-[200px] sm:w-[280px] sm:h-[280px] md:w-[350px] md:h-[350px] lg:w-[450px] lg:h-[450px] xl:w-[566px] xl:h-[566px]">
               <Image
-                src="/images/405493453_b83b297c-be8b-4cb8-b0cc-f79bddbe6abf.png"
+                src="/images/405493453_b83b297c-be8b-4cb8-b0cc-f79bddbe6abf.webp"
                 alt="bg image kanan"
                 fill
                 className="drop-shadow-lg object-contain"
+                loading="lazy"
+                sizes="(max-width: 640px) 200px, (max-width: 768px) 280px, (max-width: 1024px) 350px, (max-width: 1280px) 450px, 566px"
               />
             </div>
           </div>
@@ -451,10 +502,12 @@ export default function Home() {
           <div className="absolute left-[-105px] sm:left-[-145px] md:left-[-178px] lg:left-[-230px] xl:left-[-285px] bottom-[5px] sm:bottom-[-5px] md:bottom-[-15px] lg:bottom-[-30px] xl:bottom-[-40px] z-30">
             <div className="w-[200px] h-[200px] sm:w-[280px] sm:h-[280px] md:w-[350px] md:h-[350px] lg:w-[450px] lg:h-[450px] xl:w-[566px] xl:h-[566px]">
               <Image
-                src="/images/405493453_b83b297c-be8b-4cb8-b0cc-f79bddbe6abf.png"
+                src="/images/405493453_b83b297c-be8b-4cb8-b0cc-f79bddbe6abf.webp"
                 alt="bg image kiri"
                 fill
                 className="drop-shadow-lg"
+                loading="lazy"
+                sizes="(max-width: 640px) 200px, (max-width: 768px) 280px, (max-width: 1024px) 350px, (max-width: 1280px) 450px, 566px"
               />
             </div>
           </div>
@@ -462,17 +515,21 @@ export default function Home() {
           <div className="relative w-full flex justify-center z-30 px-4 sm:px-6 md:px-8 lg:px-10">
             <div className="relative w-full max-w-[300px] h-[500px] sm:max-w-[700px] sm:h-[608px] md:max-w-[800px] md:h-[600px] lg:max-w-[850px] lg:h-[680px] xl:max-w-[1000px] xl:h-[850px]">
               <Image
-                src="/images/Group 9.png"
+                src="/images/Group 9.webp"
                 alt="cara kerja"
                 fill
                 className="drop-shadow-lg object-contain hidden sm:block w-full"
+                loading="lazy"
+                sizes="(max-width: 640px) 300px, (max-width: 768px) 700px, (max-width: 1024px) 800px, (max-width: 1280px) 850px, 1000px"
               />
 
               <Image
-                src="/images/cara kerja m.png"
+                src="/images/cara kerja m.webp"
                 alt="cara kerja mobile"
                 fill
                 className="block sm:hidden"
+                loading="lazy"
+                sizes="100vw"
               />
             </div>
           </div>
@@ -486,17 +543,18 @@ export default function Home() {
           className="bg-white grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8 md:gap-10 items-center px-4 sm:px-6 md:px-8 lg:px-12 py-8 sm:py-12 md:py-16"
           initial={{ opacity: 0, y: 50 }}
           whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1 }}
+          transition={{ duration: 0.5 }}
           viewport={{ once: true }}
         >
           {/* Image */}
           <div className="flex justify-center order-1 lg:order-1">
             <div className="relative w-full max-w-[280px] h-[340px] sm:max-w-[320px] sm:h-[390px] md:max-w-[350px] md:h-[430px] lg:max-w-[380px] lg:h-[460px]">
               <Image
-                src="/images/7775312_3760906.jpg"
+                src="/images/7775312_3760906.webp"
                 alt="tentang kami"
                 fill
                 className="object-cover rounded-xl sm:rounded-2xl"
+                loading="lazy"
               />
             </div>
           </div>
@@ -605,10 +663,11 @@ export default function Home() {
                   {/* Logo */}
                   <div className="flex items-center mb-4 ml-[-30]">
                     <Image
-                    src="/images/KaloriME2.png"
+                    src="/images/KaloriME2.webp"
                     alt="Logo KaloriME"
                     width={250}
                     height={250}
+                    priority={true}
                   />
                   </div>
                   
@@ -619,13 +678,19 @@ export default function Home() {
                   
                   {/* Social Media Icons */}
                   <div className="flex space-x-4">
-                    <a href="#" className="w-10 h-10 bg-gray-800 hover:bg-blue-600 rounded-full flex items-center justify-center transition-colors duration-300">
+                    <a href="#"
+                       aria-label="Facebook" 
+                       className="w-10 h-10 bg-gray-800 hover:bg-blue-600 rounded-full flex items-center justify-center transition-colors duration-300">
                       <Facebook size={18} />
                     </a>
-                    <a href="#" className="w-10 h-10 bg-gray-800 hover:bg-pink-600 rounded-full flex items-center justify-center transition-colors duration-300">
+                    <a href="#" 
+                       aria-label="Instagram"
+                       className="w-10 h-10 bg-gray-800 hover:bg-pink-600 rounded-full flex items-center justify-center transition-colors duration-300">
                       <Instagram size={18} />
                     </a>
-                    <a href="#" className="w-10 h-10 bg-gray-800 hover:bg-blue-400 rounded-full flex items-center justify-center transition-colors duration-300">
+                    <a href="#" 
+                       aria-label="Twitter"
+                       className="w-10 h-10 bg-gray-800 hover:bg-blue-400 rounded-full flex items-center justify-center transition-colors duration-300">
                       <Twitter size={18} />
                     </a>
                   </div>

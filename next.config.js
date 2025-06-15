@@ -9,10 +9,23 @@ const withPWA = require('next-pwa')({
   ],
 });
 
+const withBundleAnalyzer = require('@next/bundle-analyzer')({
+  enabled: process.env.ANALYZE === 'true',
+});
+
 const nextConfig = {
+  modularizeImports: {
+    'react-icons/md': {
+      transform: 'react-icons/md/{{member}}',
+    },
+    'react-icons/fi': {
+      transform: 'react-icons/fi/{{member}}',
+    },
+  },
   images: {
     domains: ['lh3.googleusercontent.com'],
+    formats: ['image/webp', 'image/avif'],
   },
 };
 
-module.exports = withPWA(nextConfig);
+module.exports = withBundleAnalyzer(withPWA(nextConfig));
