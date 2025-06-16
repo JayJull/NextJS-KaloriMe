@@ -16,7 +16,7 @@ export const makanan = [
   {
     id: 3,
     nama: "French Fries",
-    kategori: "makanan ringan",
+    kategori: "makanan siang",
     foto: "",
     kalori: 312,
   },
