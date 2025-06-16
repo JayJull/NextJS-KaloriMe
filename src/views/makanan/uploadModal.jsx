@@ -372,7 +372,7 @@ export default function UploadModal({ isOpen, onClose, onUpload }) {
 
               {predictionInfo?.confidence && (
                 <p className="text-xs text-gray-500 mt-2">
-                  Confidence: {(predictionInfo.confidence * 100).toFixed(1)}%
+                  Confidence: {predictionInfo.confidence}
                 </p>
               )}
             </div>
@@ -428,7 +428,7 @@ export default function UploadModal({ isOpen, onClose, onUpload }) {
                 </p>
                 {predictionInfo.confidence && (
                   <p className="text-sm text-gray-500 mb-2">
-                    Confidence: {(predictionInfo.confidence * 100).toFixed(1)}%
+                    Confidence: {predictionInfo.confidence}
                   </p>
                 )}
                 <p className="text-sm text-gray-600">

@@ -1,4 +1,4 @@
-// presenters/FoodPresenter.js - Updated with confirmation flow
+// presenters/FoodPresenter.js - Fixed version to handle file properly
 import { makanan } from "@/data/interface";
 import { FoodService } from "@/models/FoodModel";
 import { Client } from "@gradio/client";
@@ -238,6 +238,9 @@ export class FoodPresenter {
 
       console.log("Matched food:", matchedFood.nama);
 
+      // FIXED: Store file as base64 string instead of object
+      const fileBase64 = await this.fileToBase64(file);
+
       // PENTING: Jangan langsung save ke database, tapi return data untuk konfirmasi
       return {
         success: true,
@@ -247,8 +250,10 @@ export class FoodPresenter {
         message: "Makanan berhasil dideteksi",
         data: {
           matchedFood: matchedFood,
-          file: file,
+          fileBase64: fileBase64, // Store as base64 string
           fileName: fileName,
+          fileType: file.type,
+          fileSize: file.size,
           userId: userId,
         },
         predictionInfo: predictionInfo,
@@ -270,12 +275,37 @@ export class FoodPresenter {
     }
   }
 
+  // Helper function to convert file to base64
+  static async fileToBase64(file) {
+    const arrayBuffer = await file.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+    return `data:${file.type};base64,${buffer.toString("base64")}`;
+  }
+
+  // Helper function to convert base64 back to file
+  static base64ToFile(base64String, fileName, fileType) {
+    const arr = base64String.split(",");
+    const mime = arr[0].match(/:(.*?);/)[1];
+    const bstr = atob(arr[1]);
+    let n = bstr.length;
+    const u8arr = new Uint8Array(n);
+
+    while (n--) {
+      u8arr[n] = bstr.charCodeAt(n);
+    }
+
+    return new File([u8arr], fileName, { type: fileType || mime });
+  }
+
   // Fungsi baru untuk konfirmasi dan save ke database
   static async confirmAndSave(data) {
     try {
-      const { matchedFood, file, fileName, userId } = data;
+      const { matchedFood, fileBase64, fileName, fileType, userId } = data;
 
       console.log("Confirming and saving to database...");
+
+      // Convert base64 back to file object
+      const file = this.base64ToFile(fileBase64, fileName, fileType);
 
       // Langkah 1: Upload gambar ke Supabase Storage
       console.log("Step 1: Uploading image to storage...");
@@ -286,8 +316,7 @@ export class FoodPresenter {
       console.log("Step 2: Saving to database...");
 
       // Get current time in WIB (UTC + 7)
-      const now = new Date();
-      const wibTime = new Date(now.getTime() + 7 * 60 * 60 * 1000);
+      const wibTime = new Date();
 
       const waktu = wibTime.toTimeString().slice(0, 8); // HH:MM:SS format
       const tanggal = wibTime.toISOString().split("T")[0]; // YYYY-MM-DD format
