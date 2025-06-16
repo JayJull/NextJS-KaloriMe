@@ -23,6 +23,7 @@ const ProfileView = () => {
     berat_badan: "",
     tinggi_badan: "",
     tingkat_aktivitas: "tidak pernah",
+    // Hapus kalori dari formData karena akan diambil otomatis
   });
 
   // UI states
@@ -113,7 +114,8 @@ const ProfileView = () => {
           tinggi_badan: userData.tinggi_badan
             ? userData.tinggi_badan.toString()
             : "",
-          tingkat_aktivitas: userData.tingkat_aktivitas || "tidak pernah", // Pastikan default value konsisten
+          tingkat_aktivitas: userData.tingkat_aktivitas || "tidak pernah",
+          // Hapus kalori dari sini karena akan diambil otomatis
         });
       } else {
         // If profile not found, use session data as fallback
@@ -121,7 +123,8 @@ const ProfileView = () => {
           ...prev,
           nama: session?.user?.name || "",
           email: session?.user?.email || "",
-          tingkat_aktivitas: "tidak pernah", // Set default
+          tingkat_aktivitas: "tidak pernah",
+          // Hapus kalori dari sini
         }));
       }
     } catch (error) {
@@ -131,7 +134,8 @@ const ProfileView = () => {
         ...prev,
         nama: session?.user?.name || "",
         email: session?.user?.email || "",
-        tingkat_aktivitas: "tidak pernah", // Set default
+        tingkat_aktivitas: "tidak pernah",
+        // Hapus kalori dari sini
       }));
       setErrors({
         general: "Gagal memuat data profil. Menggunakan data sesi.",
@@ -164,6 +168,7 @@ const ProfileView = () => {
       }
     }
 
+    // Calculate daily calories - ini yang akan digunakan sebagai kalori otomatis
     if (berat_badan && tinggi_badan && umur) {
       const weight = parseFloat(berat_badan);
       const height = parseFloat(tinggi_badan);
@@ -192,7 +197,7 @@ const ProfileView = () => {
     });
   };
 
-  // Validation function
+  // Validation function - hapus validasi kalori
   const validateField = (fieldName, value) => {
     switch (fieldName) {
       case "nama":
@@ -253,6 +258,8 @@ const ProfileView = () => {
         }
         return null;
 
+      // Hapus validasi kalori karena tidak diperlukan lagi
+
       default:
         return null;
     }
@@ -302,6 +309,7 @@ const ProfileView = () => {
       "umur",
       "berat_badan",
       "tinggi_badan",
+      // Hapus kalori dari validasi
     ];
 
     fieldsToValidate.forEach((field) => {
@@ -318,24 +326,28 @@ const ProfileView = () => {
     }
 
     try {
+      // Prepare data untuk dikirim - kalori akan diambil otomatis dari dailyCalories
+      const submitData = {
+        nama: formData.nama.trim(),
+        email: formData.email.toLowerCase().trim(),
+        umur: formData.umur ? parseInt(formData.umur) : null,
+        berat_badan: formData.berat_badan
+          ? parseFloat(formData.berat_badan)
+          : null,
+        tinggi_badan: formData.tinggi_badan
+          ? parseFloat(formData.tinggi_badan)
+          : null,
+        tingkat_aktivitas: formData.tingkat_aktivitas,
+        // Kalori akan dihitung otomatis di backend dari dailyCalories
+        // Tidak perlu mengirim kalori secara manual
+      };
+
       const response = await fetch("/api/profile/update", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          // Kirim dengan format yang sesuai dengan ProfilePresenter
-          nama: formData.nama.trim(), // Ubah dari 'name' ke 'nama'
-          email: formData.email.toLowerCase().trim(),
-          umur: formData.umur ? parseInt(formData.umur) : null, // Ubah dari 'age' ke 'umur'
-          berat_badan: formData.berat_badan
-            ? parseFloat(formData.berat_badan)
-            : null, // Ubah dari 'weight'
-          tinggi_badan: formData.tinggi_badan
-            ? parseFloat(formData.tinggi_badan)
-            : null, // Ubah dari 'height'
-          tingkat_aktivitas: formData.tingkat_aktivitas, // Ubah dari 'activityLevel'
-        }),
+        body: JSON.stringify(submitData),
       });
 
       const result = await response.json();
@@ -347,7 +359,7 @@ const ProfileView = () => {
         // Auto-hide success message after 3 seconds
         setTimeout(() => setSuccess(false), 3000);
 
-        // Optional: Reload profile data untuk sinkronisasi
+        // Reload profile data untuk sinkronisasi
         if (result.data) {
           setFormData({
             nama: result.data.nama || "",
@@ -360,11 +372,11 @@ const ProfileView = () => {
               ? result.data.tinggi_badan.toString()
               : "",
             tingkat_aktivitas: result.data.tingkat_aktivitas || "tidak pernah",
+            // Tidak perlu set kalori karena akan diambil otomatis
           });
         }
       } else {
         setErrors(result.errors || {});
-        // If there's a general error message, show it
         if (result.message && !result.errors) {
           setErrors({ general: result.message });
         }
@@ -456,6 +468,7 @@ const ProfileView = () => {
                 {healthMetrics.dailyCalories || "-"}
               </div>
               <div className="text-sm text-gray-600">kcal/hari</div>
+              <div className="text-xs text-gray-500 mt-1">Otomatis</div>
             </div>
           </div>
 
@@ -463,7 +476,8 @@ const ProfileView = () => {
           {success && (
             <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
               <div className="text-green-600 text-sm font-medium">
-                Profil berhasil diperbarui!
+                Profil berhasil diperbarui! Kalori harian telah dihitung
+                otomatis.
               </div>
             </div>
           )}
@@ -707,6 +721,28 @@ const ProfileView = () => {
                   ))}
                 </div>
               </div>
+
+              {/* Auto Calories Info */}
+              {healthMetrics.dailyCalories && (
+                <div className="border-t pt-6">
+                  <div className="bg-blue-50 rounded-lg p-4">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <h4 className="font-medium text-blue-900">
+                          Kebutuhan Kalori Harian
+                        </h4>
+                        <p className="text-sm text-blue-700 mt-1">
+                          Dihitung otomatis berdasarkan data fisik dan aktivitas
+                          Anda
+                        </p>
+                      </div>
+                      <div className="text-2xl font-bold text-blue-600">
+                        {healthMetrics.dailyCalories} kcal
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
 
               {/* BMI Status */}
               {healthMetrics.bmi && (

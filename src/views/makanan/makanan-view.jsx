@@ -22,12 +22,24 @@ export default function MakananView() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  // Remove local selectedDate state since it will come from Header
-  const [selectedDate, setSelectedDate] = useState(new Date());
+  // Initialize with current date in local timezone
+  const [selectedDate, setSelectedDate] = useState(() => {
+    const now = new Date();
+    // Reset time to start of day in local timezone
+    return new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  });
 
   useEffect(() => {
     loadFoods();
   }, [selectedDate]); // Reload when date changes
+
+  // Helper function to format date consistently for API calls
+  const formatDateForAPI = (date) => {
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0');
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
 
   const loadFoods = async () => {
     try {
@@ -40,8 +52,9 @@ export default function MakananView() {
         return;
       }
 
-      // Format date to YYYY-MM-DD
-      const dateString = selectedDate.toISOString().split("T")[0];
+      // Use consistent date formatting
+      const dateString = formatDateForAPI(selectedDate);
+      console.log("Loading foods for date:", dateString, "Selected date object:", selectedDate);
 
       const response = await fetch(
         `/api/food/upload?userId=${userId}&type=foods&date=${dateString}`
@@ -63,14 +76,19 @@ export default function MakananView() {
 
   // This function will be called from Header via App component
   const handleDateChange = (date) => {
-    setSelectedDate(date);
-    console.log("Date changed in MakananView:", date);
+    // Ensure we're working with a proper Date object and reset time
+    const normalizedDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    setSelectedDate(normalizedDate);
+    console.log("Date changed in MakananView:", normalizedDate, "Formatted:", formatDateForAPI(normalizedDate));
   };
 
   const openModal = () => {
-    // Check if selected date is today
+    // Check if selected date is today (compare dates only, not time)
     const today = new Date();
-    const isToday = selectedDate.toDateString() === today.toDateString();
+    const todayNormalized = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    const selectedNormalized = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), selectedDate.getDate());
+    
+    const isToday = selectedNormalized.getTime() === todayNormalized.getTime();
 
     if (!isToday) {
       alert("Anda hanya dapat menambahkan makanan pada tanggal hari ini!");
@@ -123,7 +141,9 @@ export default function MakananView() {
   // Helper function to check if date is today
   const isToday = (date) => {
     const today = new Date();
-    return date.toDateString() === today.toDateString();
+    const todayNormalized = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    const dateNormalized = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    return dateNormalized.getTime() === todayNormalized.getTime();
   };
 
   // Format date for display

@@ -1,0 +1,37 @@
+// app/api/reports/calendar/route.js
+import { NextRequest, NextResponse } from "next/server";
+import { ReportPresenter } from "@/presenters/ReportPresenter";
+
+export async function GET(request) {
+  try {
+    const { searchParams } = new URL(request.url);
+    const userId = searchParams.get("userId");
+    const year = parseInt(searchParams.get("year") || new Date().getFullYear());
+    const month = parseInt(
+      searchParams.get("month") || new Date().getMonth() + 1
+    );
+
+    if (!userId) {
+      return NextResponse.json(
+        { success: false, message: "User ID is required" },
+        { status: 400 }
+      );
+    }
+
+    const result = await ReportPresenter.getMonthlyReport(userId, year, month);
+
+    return NextResponse.json(result, {
+      status: result.success ? 200 : 500,
+    });
+  } catch (error) {
+    console.error("Error in calendar reports API:", error);
+    return NextResponse.json(
+      {
+        success: false,
+        message: "Internal server error",
+        error: error.message,
+      },
+      { status: 500 }
+    );
+  }
+}

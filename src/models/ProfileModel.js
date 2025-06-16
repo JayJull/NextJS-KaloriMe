@@ -7,7 +7,7 @@ export class ProfileModel {
       const { data, error } = await supabase
         .from("users")
         .select(
-          "id_users, nama, email, umur, berat_badan, tinggi_badan, tingkat_aktivitas, provider, provider_id"
+          "id_users, nama, email, umur, berat_badan, tinggi_badan, tingkat_aktivitas, kalori, provider, provider_id"
         )
         .eq("email", email.toLowerCase())
         .single();
@@ -34,7 +34,7 @@ export class ProfileModel {
       const { data, error } = await supabase
         .from("users")
         .select(
-          "id_users, nama, email, umur, berat_badan, tinggi_badan, tingkat_aktivitas, provider, provider_id"
+          "id_users, nama, email, umur, berat_badan, tinggi_badan, tingkat_aktivitas, kalori, provider, provider_id"
         )
         .eq("id_users", userId)
         .single();
@@ -65,6 +65,7 @@ export class ProfileModel {
         berat_badan,
         tinggi_badan,
         tingkat_aktivitas,
+        kalori,
       } = profileData;
 
       console.log("Updating profile for user:", userId);
@@ -121,6 +122,9 @@ export class ProfileModel {
           this.normalizeActivityLevel(tingkat_aktivitas);
         updateData.tingkat_aktivitas = normalizedActivity;
       }
+      if (kalori !== undefined && kalori !== null && kalori !== "") {
+        updateData.kalori = parseInt(kalori);
+      }
 
       console.log("Final update data:", updateData);
 
@@ -135,7 +139,7 @@ export class ProfileModel {
         .update(updateData)
         .eq("id_users", userId)
         .select(
-          "id_users, nama, email, umur, berat_badan, tinggi_badan, tingkat_aktivitas, provider, provider_id"
+          "id_users, nama, email, umur, berat_badan, tinggi_badan, tingkat_aktivitas, kalori, provider, provider_id"
         )
         .single();
 
@@ -257,6 +261,18 @@ export class ProfileModel {
       }
     }
 
+    // Validasi kalori (opsional)
+    if (
+      data.kalori !== null &&
+      data.kalori !== undefined &&
+      data.kalori !== ""
+    ) {
+      const calories = parseInt(data.kalori);
+      if (isNaN(calories) || calories < 800 || calories > 10000) {
+        errors.kalori = "Kalori harus antara 800-10000 kcal";
+      }
+    }
+
     return {
       isValid: Object.keys(errors).length === 0,
       errors,
@@ -345,6 +361,8 @@ export class ProfileModel {
       bmi: bmi,
       bmi_status: this.getBMIStatus(bmi),
       daily_calories: dailyCalories,
+      // Jika kalori tidak ada di database, gunakan calculated daily calories
+      kalori: userData.kalori || dailyCalories,
     };
   }
 }

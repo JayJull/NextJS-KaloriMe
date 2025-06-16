@@ -82,8 +82,44 @@ export async function POST(request) {
 
     const userId = currentUser.user.id_users;
 
+    // Hitung kalori otomatis dari dailyCalories jika tidak ada kalori yang diberikan
+    let calculatedCalories = null;
+    if (
+      body.berat_badan &&
+      body.tinggi_badan &&
+      body.umur &&
+      body.tingkat_aktivitas
+    ) {
+      // Hitung BMR (Basal Metabolic Rate) untuk pria
+      const bmr =
+        88.362 +
+        13.397 * parseFloat(body.berat_badan) +
+        4.799 * parseFloat(body.tinggi_badan) -
+        5.677 * parseInt(body.umur);
+
+      // Activity multipliers
+      const activityMultipliers = {
+        "tidak pernah": 1.2,
+        ringan: 1.375,
+        sedang: 1.55,
+        aktif: 1.725,
+        "sangat aktif": 1.9,
+      };
+
+      const multiplier = activityMultipliers[body.tingkat_aktivitas] || 1.2;
+      calculatedCalories = Math.round(bmr * multiplier);
+    }
+
+    // Tambahkan kalori ke body request
+    const updatedBody = {
+      ...body,
+      kalori: body.kalori || calculatedCalories || null,
+    };
+
+    console.log("Updated body with calories:", updatedBody);
+
     // Update profile using presenter
-    const result = await ProfilePresenter.updateProfile(userId, body);
+    const result = await ProfilePresenter.updateProfile(userId, updatedBody);
     console.log("Update result:", result);
 
     const response = ProfilePresenter.formatApiResponse(result);

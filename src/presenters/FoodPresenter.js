@@ -1,9 +1,33 @@
-// presenters/FoodPresenter.js - Fixed version to handle file properly
+// presenters/FoodPresenter.js - Fixed version with proper date/time handling
 import { makanan } from "@/data/interface";
 import { FoodService } from "@/models/FoodModel";
 import { Client } from "@gradio/client";
 
 export class FoodPresenter {
+  // Helper function untuk mendapatkan waktu WIB yang benar
+  static getWIBDateTime() {
+    // Buat date object untuk waktu sekarang
+    const now = new Date();
+
+    // Konversi ke WIB (UTC+7)
+    const wibOffset = 7 * 60; // 7 jam dalam menit
+    const utc = now.getTime() + now.getTimezoneOffset() * 60000;
+    const wibTime = new Date(utc + wibOffset * 60000);
+
+    // Format waktu HH:MM:SS
+    const waktu = wibTime.toTimeString().slice(0, 8);
+
+    // Format tanggal YYYY-MM-DD
+    const year = wibTime.getFullYear();
+    const month = String(wibTime.getMonth() + 1).padStart(2, "0");
+    const day = String(wibTime.getDate()).padStart(2, "0");
+    const tanggal = `${year}-${month}-${day}`;
+
+    console.log("WIB DateTime:", { waktu, tanggal, fullDate: wibTime });
+
+    return { waktu, tanggal, fullDate: wibTime };
+  }
+
   // Fungsi prediksi gambar menggunakan Gradio Client
   static async predictImage(file) {
     try {
@@ -169,9 +193,10 @@ export class FoodPresenter {
 
   // Check if date is today
   static isToday(date) {
-    const today = new Date();
-    const checkDate = new Date(date);
-    return checkDate.toDateString() === today.toDateString();
+    const { tanggal: todayWIB } = this.getWIBDateTime();
+    const checkDate =
+      typeof date === "string" ? date : date.toISOString().split("T")[0];
+    return checkDate === todayWIB;
   }
 
   // Proses upload dengan Gradio API prediksi - TANPA langsung save ke database
@@ -304,7 +329,7 @@ export class FoodPresenter {
     return new File([u8arr], fileName, { type: fileType || mime });
   }
 
-  // Fungsi baru untuk konfirmasi dan save ke database
+  // Fungsi baru untuk konfirmasi dan save ke database - FIXED DATE/TIME
   static async confirmAndSave(data) {
     try {
       const { matchedFood, fileBase64, fileName, fileType, userId } = data;
@@ -322,12 +347,10 @@ export class FoodPresenter {
       // Langkah 2: Simpan ke database
       console.log("Step 2: Saving to database...");
 
-      // Get current time in WIB (UTC + 7)
-      const now = new Date();
-      const wibTime = new Date(now.getTime() + 7 * 60 * 60 * 1000);
+      // FIXED: Gunakan fungsi getWIBDateTime() untuk waktu yang benar
+      const { waktu, tanggal } = this.getWIBDateTime();
 
-      const waktu = wibTime.toTimeString().slice(0, 8); // HH:MM:SS format
-      const tanggal = wibTime.toISOString().split("T")[0]; // YYYY-MM-DD format
+      console.log("Using WIB time:", { waktu, tanggal });
 
       // Prepare data untuk has_been_eaten
       const hasBeenEatenData = {
@@ -378,7 +401,7 @@ export class FoodPresenter {
     }));
   }
 
-  // Get user's today consumption
+  // Get user's today consumption - FIXED untuk menggunakan tanggal WIB
   static async getTodayConsumption(userId) {
     try {
       const data = await FoodService.getTodayHasBeenEaten(userId);
