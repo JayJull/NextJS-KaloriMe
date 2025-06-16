@@ -1,4 +1,4 @@
-// presenters/FoodPresenter.js - Updated with confirmation flow
+// presenters/FoodPresenter.js - Fixed version to handle file properly
 import { makanan } from "@/data/interface";
 import { FoodService } from "@/models/FoodModel";
 import { Client } from "@gradio/client";
@@ -167,6 +167,13 @@ export class FoodPresenter {
     return matchedFood;
   }
 
+  // Check if date is today
+  static isToday(date) {
+    const today = new Date();
+    const checkDate = new Date(date);
+    return checkDate.toDateString() === today.toDateString();
+  }
+
   // Proses upload dengan Gradio API prediksi - TANPA langsung save ke database
   static async processUpload(file, userId) {
     try {
@@ -238,6 +245,9 @@ export class FoodPresenter {
 
       console.log("Matched food:", matchedFood.nama);
 
+      // FIXED: Store file as base64 string instead of object
+      const fileBase64 = await this.fileToBase64(file);
+
       // PENTING: Jangan langsung save ke database, tapi return data untuk konfirmasi
       return {
         success: true,
@@ -247,8 +257,10 @@ export class FoodPresenter {
         message: "Makanan berhasil dideteksi",
         data: {
           matchedFood: matchedFood,
-          file: file,
+          fileBase64: fileBase64, // Store as base64 string
           fileName: fileName,
+          fileType: file.type,
+          fileSize: file.size,
           userId: userId,
         },
         predictionInfo: predictionInfo,
@@ -270,12 +282,37 @@ export class FoodPresenter {
     }
   }
 
+  // Helper function to convert file to base64
+  static async fileToBase64(file) {
+    const arrayBuffer = await file.arrayBuffer();
+    const buffer = Buffer.from(arrayBuffer);
+    return `data:${file.type};base64,${buffer.toString("base64")}`;
+  }
+
+  // Helper function to convert base64 back to file
+  static base64ToFile(base64String, fileName, fileType) {
+    const arr = base64String.split(",");
+    const mime = arr[0].match(/:(.*?);/)[1];
+    const bstr = atob(arr[1]);
+    let n = bstr.length;
+    const u8arr = new Uint8Array(n);
+
+    while (n--) {
+      u8arr[n] = bstr.charCodeAt(n);
+    }
+
+    return new File([u8arr], fileName, { type: fileType || mime });
+  }
+
   // Fungsi baru untuk konfirmasi dan save ke database
   static async confirmAndSave(data) {
     try {
-      const { matchedFood, file, fileName, userId } = data;
+      const { matchedFood, fileBase64, fileName, fileType, userId } = data;
 
       console.log("Confirming and saving to database...");
+
+      // Convert base64 back to file object
+      const file = this.base64ToFile(fileBase64, fileName, fileType);
 
       // Langkah 1: Upload gambar ke Supabase Storage
       console.log("Step 1: Uploading image to storage...");
@@ -286,22 +323,10 @@ export class FoodPresenter {
       console.log("Step 2: Saving to database...");
 
       // Get current time in WIB (UTC + 7)
-      const now = new Date();
-      const wibTime = new Date(now.getTime() + 7 * 60 * 60 * 1000);
+      const wibTime = new Date();
 
       const waktu = wibTime.toTimeString().slice(0, 8); // HH:MM:SS format
       const tanggal = wibTime.toISOString().split("T")[0]; // YYYY-MM-DD format
-
-      // Prepare data untuk report
-      const reportData = {
-        nama_makanan: matchedFood.nama,
-        kategori: matchedFood.kategori,
-        kalori: matchedFood.kalori,
-        foto: imageUrl,
-        waktu: waktu,
-        tanggal: tanggal,
-        id_users: userId,
-      };
 
       // Prepare data untuk has_been_eaten
       const hasBeenEatenData = {
@@ -314,10 +339,7 @@ export class FoodPresenter {
         id_users: userId,
       };
 
-      // Insert ke kedua table
-      console.log("Inserting to report table:", reportData);
-      const reportResult = await FoodService.createReport(reportData);
-
+      // Insert ke has_been_eaten table
       console.log("Inserting to has_been_eaten table:", hasBeenEatenData);
       const hasBeenEatenResult = await FoodService.createHasBeenEaten(
         hasBeenEatenData
@@ -327,7 +349,6 @@ export class FoodPresenter {
         success: true,
         message: `Berhasil menambahkan ${matchedFood.nama} (${matchedFood.kalori} kalori)`,
         data: {
-          report: reportResult,
           hasBeenEaten: hasBeenEatenResult,
           matchedFood: matchedFood,
         },
@@ -367,13 +388,13 @@ export class FoodPresenter {
     }
   }
 
-  // Get all food reports for makanan view
-  static async getAllFoodReports(userId = null) {
+  // Get user's consumption by date
+  static async getConsumptionByDate(userId, date) {
     try {
-      const reports = await FoodService.getAllFoodReports(userId);
-      return this.formatReportData(reports);
+      const data = await FoodService.getHasBeenEatenByDate(userId, date);
+      return this.formatReportData(data);
     } catch (error) {
-      console.error("Error fetching food reports:", error);
+      console.error("Error fetching consumption by date:", error);
       throw error;
     }
   }
@@ -399,17 +420,17 @@ export class FoodPresenter {
     }));
   }
 
-  // Delete food report
-  static async deleteFoodReport(reportId, userId) {
+  // Delete has_been_eaten record
+  static async deleteHasBeenEaten(recordId, userId) {
     try {
-      const result = await FoodService.deleteFoodReport(reportId, userId);
+      const result = await FoodService.deleteHasBeenEaten(recordId, userId);
       return {
         success: true,
         message: "Makanan berhasil dihapus",
         data: result,
       };
     } catch (error) {
-      console.error("Error deleting food report:", error);
+      console.error("Error deleting has_been_eaten record:", error);
       return {
         success: false,
         message: "Gagal menghapus makanan",

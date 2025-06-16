@@ -26,23 +26,6 @@ export class FoodService {
     }
   }
 
-  // Insert ke table report
-  static async createReport(reportData) {
-    try {
-      const { data, error } = await supabase
-        .from("report")
-        .insert([reportData])
-        .select()
-        .single();
-
-      if (error) throw error;
-      return data;
-    } catch (error) {
-      console.error("Error creating report:", error);
-      throw error;
-    }
-  }
-
   // Insert ke table has_been_eaten
   static async createHasBeenEaten(eatenData) {
     try {
@@ -56,22 +39,6 @@ export class FoodService {
       return data;
     } catch (error) {
       console.error("Error creating has_been_eaten:", error);
-      throw error;
-    }
-  }
-
-  // Get all reports
-  static async getAllReports() {
-    try {
-      const { data, error } = await supabase
-        .from("report")
-        .select("*")
-        .order("tanggal", { ascending: false });
-
-      if (error) throw error;
-      return data;
-    } catch (error) {
-      console.error("Error fetching reports:", error);
       throw error;
     }
   }
@@ -92,6 +59,24 @@ export class FoodService {
       return data;
     } catch (error) {
       console.error("Error fetching today has_been_eaten:", error);
+      throw error;
+    }
+  }
+
+  // Get has_been_eaten by user for specific date
+  static async getHasBeenEatenByDate(userId, date) {
+    try {
+      const { data, error } = await supabase
+        .from("has_been_eaten")
+        .select("*")
+        .eq("id_users", userId)
+        .eq("tanggal", date)
+        .order("waktu", { ascending: false });
+
+      if (error) throw error;
+      return data;
+    } catch (error) {
+      console.error("Error fetching has_been_eaten by date:", error);
       throw error;
     }
   }
@@ -153,34 +138,13 @@ export class FoodService {
     }
   }
 
-  // Get food data from reports table for makanan view
-  static async getAllFoodReports(userId = null) {
-    try {
-      let query = supabase
-        .from("report")
-        .select("*")
-        .order("tanggal", { ascending: false });
-
-      if (userId) {
-        query = query.eq("id_users", userId);
-      }
-
-      const { data, error } = await query;
-      if (error) throw error;
-      return data;
-    } catch (error) {
-      console.error("Error fetching food reports:", error);
-      throw error;
-    }
-  }
-
-  // Delete food report
-  static async deleteFoodReport(reportId, userId) {
+  // Delete has_been_eaten record
+  static async deleteHasBeenEaten(recordId, userId) {
     try {
       const { data, error } = await supabase
-        .from("report")
+        .from("has_been_eaten")
         .delete()
-        .eq("id", reportId)
+        .eq("id", recordId)
         .eq("id_users", userId)
         .select()
         .single();
@@ -188,7 +152,7 @@ export class FoodService {
       if (error) throw error;
       return data;
     } catch (error) {
-      console.error("Error deleting food report:", error);
+      console.error("Error deleting has_been_eaten record:", error);
       throw error;
     }
   }
