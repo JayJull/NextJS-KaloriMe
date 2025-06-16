@@ -83,9 +83,35 @@ export class ProfilePresenter {
           profileData.activityLevel ||
           profileData.tingkat_aktivitas ||
           currentUser.tingkat_aktivitas,
+        kalori:
+          profileData.calories !== undefined && profileData.calories !== null
+            ? parseInt(profileData.calories)
+            : profileData.kalori !== undefined
+            ? profileData.kalori
+            : currentUser.kalori,
       };
 
       console.log("Merged data:", mergedData);
+
+      // Hitung kalori otomatis jika tidak diset manual
+      if (
+        !mergedData.kalori &&
+        mergedData.berat_badan &&
+        mergedData.tinggi_badan &&
+        mergedData.umur
+      ) {
+        const calculatedCalories = ProfileModel.calculateDailyCalories(
+          mergedData.berat_badan,
+          mergedData.tinggi_badan,
+          mergedData.umur,
+          mergedData.tingkat_aktivitas
+        );
+        if (calculatedCalories) {
+          mergedData.kalori = calculatedCalories;
+        }
+      }
+
+      console.log("Merged data with calculated calories:", mergedData);
 
       // Validasi input
       const validation = ProfileModel.validateProfileData(mergedData);
@@ -210,6 +236,16 @@ export class ProfilePresenter {
         }
         return null;
 
+      case "kalori":
+      case "calories":
+        if (value !== null && value !== undefined && value !== "") {
+          const calories = parseInt(value);
+          if (isNaN(calories) || calories < 800 || calories > 10000) {
+            return "Kalori harus antara 800-10000 kcal";
+          }
+        }
+        return null;
+
       default:
         return null;
     }
@@ -217,7 +253,8 @@ export class ProfilePresenter {
 
   // Calculate health metrics
   static calculateHealthMetrics(profileData) {
-    const { berat_badan, tinggi_badan, umur, tingkat_aktivitas } = profileData;
+    const { berat_badan, tinggi_badan, umur, tingkat_aktivitas, kalori } =
+      profileData;
 
     const bmi = ProfileModel.calculateBMI(berat_badan, tinggi_badan);
     const dailyCalories = ProfileModel.calculateDailyCalories(
@@ -232,6 +269,7 @@ export class ProfilePresenter {
       bmi: bmi,
       bmi_status: bmiStatus,
       daily_calories: dailyCalories,
+      kalori: kalori || dailyCalories, // Gunakan kalori yang disimpan atau kalori terhitung
     };
   }
 
@@ -292,6 +330,7 @@ export class ProfilePresenter {
       "berat_badan",
       "tinggi_badan",
       "tingkat_aktivitas",
+      "kalori",
     ];
 
     fieldsToCompare.forEach((field) => {

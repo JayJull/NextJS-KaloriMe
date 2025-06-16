@@ -1,7 +1,23 @@
-// models/FoodModel.js
+// models/FoodModel.js - Fixed version with proper WIB date handling
 import { supabase } from "@/lib/db";
 
 export class FoodService {
+  // Helper function untuk mendapatkan tanggal WIB
+  static getWIBDate() {
+    const now = new Date();
+    const wibOffset = 7 * 60; // 7 jam dalam menit
+    const utc = now.getTime() + now.getTimezoneOffset() * 60000;
+    const wibTime = new Date(utc + wibOffset * 60000);
+
+    const year = wibTime.getFullYear();
+    const month = String(wibTime.getMonth() + 1).padStart(2, "0");
+    const day = String(wibTime.getDate()).padStart(2, "0");
+    const wibDate = `${year}-${month}-${day}`;
+
+    console.log("WIB Date for query:", wibDate);
+    return wibDate;
+  }
+
   // Upload gambar ke Supabase Storage
   static async uploadImage(file, fileName) {
     try {
@@ -43,19 +59,26 @@ export class FoodService {
     }
   }
 
-  // Get has_been_eaten by user for today
+  // Get has_been_eaten by user for today - FIXED to use WIB date
   static async getTodayHasBeenEaten(userId) {
     try {
-      const today = new Date().toISOString().split("T")[0];
+      // FIXED: Gunakan tanggal WIB yang benar
+      const todayWIB = this.getWIBDate();
+
+      console.log(
+        `Querying has_been_eaten for user ${userId} on date ${todayWIB}`
+      );
 
       const { data, error } = await supabase
         .from("has_been_eaten")
         .select("*")
         .eq("id_users", userId)
-        .eq("tanggal", today)
+        .eq("tanggal", todayWIB)
         .order("waktu", { ascending: false });
 
       if (error) throw error;
+
+      console.log(`Found ${data.length} records for today (${todayWIB})`);
       return data;
     } catch (error) {
       console.error("Error fetching today has_been_eaten:", error);
@@ -66,6 +89,8 @@ export class FoodService {
   // Get has_been_eaten by user for specific date
   static async getHasBeenEatenByDate(userId, date) {
     try {
+      console.log(`Querying has_been_eaten for user ${userId} on date ${date}`);
+
       const { data, error } = await supabase
         .from("has_been_eaten")
         .select("*")
@@ -74,6 +99,8 @@ export class FoodService {
         .order("waktu", { ascending: false });
 
       if (error) throw error;
+
+      console.log(`Found ${data.length} records for date ${date}`);
       return data;
     } catch (error) {
       console.error("Error fetching has_been_eaten by date:", error);
@@ -94,46 +121,6 @@ export class FoodService {
       return data;
     } catch (error) {
       console.error("Error fetching has_been_eaten:", error);
-      throw error;
-    }
-  }
-
-  // Delete old has_been_eaten records (called by cron job)
-  // Hapus data yang sudah lebih dari 1 hari (24 jam) dari sekarang
-  static async deleteOldRecords() {
-    try {
-      // Buat cutoff time: 24 jam yang lalu dari sekarang
-      const now = new Date();
-      const cutoffTime = new Date(now.getTime() - 24 * 60 * 60 * 1000); // 24 jam yang lalu
-
-      console.log(`Deleting records older than: ${cutoffTime.toISOString()}`);
-      console.log(`Current time: ${now.toISOString()}`);
-
-      const cutoffDate = cutoffTime.toISOString().split("T")[0];
-
-      const { data, error } = await supabase
-        .from("has_been_eaten")
-        .delete()
-        .lte("tanggal", cutoffDate)
-        .select();
-
-      if (error) {
-        console.error("Error in delete query:", error);
-        throw error;
-      }
-
-      const deletedCount = data ? data.length : 0;
-      console.log(`Successfully deleted ${deletedCount} old records`);
-      console.log(`Cutoff date used: ${cutoffDate}`);
-
-      return {
-        success: true,
-        deletedCount: deletedCount,
-        cutoffDate: cutoffDate,
-        timestamp: now.toISOString(),
-      };
-    } catch (error) {
-      console.error("Error deleting old records:", error);
       throw error;
     }
   }

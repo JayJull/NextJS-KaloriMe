@@ -1,339 +1,348 @@
-// src/presenters/ReportPresenter.js
-
-import { ReportModel } from "@/models/Report";
+// presenters/ReportPresenter.js
+import { ReportService } from "@/models/ReportModel";
 
 export class ReportPresenter {
-  constructor() {
-    this.reportModel = new ReportModel();
+  // Format report data for display
+  static formatReportData(reports) {
+    return reports.map((report) => ({
+      id: report.id,
+      nama_makanan: report.nama_makanan || "Unknown Food",
+      kategori: report.kategori || "Lainnya",
+      kalori: report.kalori || 0,
+      foto:
+        report.foto ||
+        "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=150&h=150&fit=crop&crop=center",
+      waktu: report.waktu,
+      tanggal: report.tanggal,
+      waktu_formatted: report.waktu,
+      tanggal_formatted: new Date(report.tanggal).toLocaleDateString("id-ID", {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      }),
+    }));
   }
 
-  async createReport(reportData) {
+  // Get report by date range
+  static async getReportByDateRange(userId, startDate, endDate) {
     try {
-      const validation = this.validateReportInput(reportData);
-      if (!validation.isValid) {
-        return {
-          success: false,
-          error: validation.message,
-        };
-      }
-
-      const existingReports = await this.reportModel.findByMakananId(
-        reportData.id_makanan
+      const data = await ReportService.getReportByDateRange(
+        userId,
+        startDate,
+        endDate
       );
-      const report = await this.reportModel.create(reportData);
-
       return {
         success: true,
-        data: report,
-        message: `Laporan berhasil dibuat. Total laporan untuk makanan ini: ${
-          existingReports.length + 1
-        }`,
+        data: this.formatReportData(data),
+        message: "Data laporan berhasil diambil",
       };
     } catch (error) {
+      console.error("Error getting report by date range:", error);
       return {
         success: false,
+        message: "Gagal mengambil data laporan",
         error: error.message,
+        data: [],
       };
     }
   }
 
-  async getReportById(id_report) {
+  // Get report by days (7, 14, 30 days)
+  static async getReportByDays(userId, days) {
     try {
-      if (!id_report || id_report <= 0) {
-        return {
-          success: false,
-          error: "ID report tidak valid",
-        };
-      }
-
-      const report = await this.reportModel.findById(id_report);
-
-      if (!report) {
-        return {
-          success: false,
-          error: "Report tidak ditemukan",
-        };
-      }
-
+      const data = await ReportService.getReportByDays(userId, days);
       return {
         success: true,
-        data: report,
+        data: this.formatReportData(data),
+        message: `Data laporan ${days} hari terakhir berhasil diambil`,
       };
     } catch (error) {
+      console.error("Error getting report by days:", error);
       return {
         success: false,
+        message: `Gagal mengambil data laporan ${days} hari terakhir`,
         error: error.message,
+        data: [],
       };
     }
   }
 
-  async getReportsByMakananId(id_makanan) {
+  // Get monthly report with calendar format
+  static async getMonthlyReport(userId, year, month) {
     try {
-      if (!id_makanan || id_makanan <= 0) {
-        return {
-          success: false,
-          error: "ID makanan tidak valid",
-        };
-      }
-
-      const reports = await this.reportModel.findByMakananId(id_makanan);
-
+      const data = await ReportService.getCalendarData(userId, year, month);
       return {
         success: true,
-        data: reports,
-        message: `Ditemukan ${reports.length} laporan untuk makanan ini`,
+        data: data,
+        message: "Data laporan bulanan berhasil diambil",
       };
     } catch (error) {
+      console.error("Error getting monthly report:", error);
       return {
         success: false,
+        message: "Gagal mengambil data laporan bulanan",
         error: error.message,
+        data: {},
       };
     }
   }
 
-  async getAllReports(page = 1, limit = 10) {
+  // Get consumption summary
+  static async getConsumptionSummary(userId, days = 7) {
     try {
-      if (page <= 0 || limit <= 0) {
-        return {
-          success: false,
-          error: "Page dan limit harus lebih dari 0",
-        };
-      }
+      const endDate = new Date();
+      const startDate = new Date();
+      startDate.setDate(endDate.getDate() - days);
 
-      if (limit > 100) {
-        return {
-          success: false,
-          error: "Limit maksimal 100",
-        };
-      }
+      const endDateStr = endDate.toISOString().split("T")[0];
+      const startDateStr = startDate.toISOString().split("T")[0];
 
-      const offset = (page - 1) * limit;
-      const reports = await this.reportModel.findAll(limit, offset);
-
-      return {
-        success: true,
-        data: reports,
-        message: `Halaman ${page}, menampilkan ${reports.length} laporan`,
-      };
-    } catch (error) {
-      return {
-        success: false,
-        error: error.message,
-      };
-    }
-  }
-
-  async deleteReport(id_report) {
-    try {
-      if (!id_report || id_report <= 0) {
-        return {
-          success: false,
-          error: "ID report tidak valid",
-        };
-      }
-
-      const deleted = await this.reportModel.delete(id_report);
-
-      if (!deleted) {
-        return {
-          success: false,
-          error: "Report tidak ditemukan",
-        };
-      }
-
-      return {
-        success: true,
-        message: "Report berhasil dihapus",
-      };
-    } catch (error) {
-      return {
-        success: false,
-        error: error.message,
-      };
-    }
-  }
-
-  async getReportCount(id_makanan) {
-    try {
-      if (!id_makanan || id_makanan <= 0) {
-        return {
-          success: false,
-          error: "ID makanan tidak valid",
-        };
-      }
-
-      const count = await this.reportModel.getReportCount(id_makanan);
-
-      return {
-        success: true,
-        data: { count },
-        message: `Makanan ini memiliki ${count} laporan`,
-      };
-    } catch (error) {
-      return {
-        success: false,
-        error: error.message,
-      };
-    }
-  }
-
-  async getRecentReports(days = 7) {
-    try {
-      if (days <= 0 || days > 365) {
-        return {
-          success: false,
-          error: "Jumlah hari harus antara 1-365",
-        };
-      }
-
-      const reports = await this.reportModel.getRecentReports(days);
-
-      return {
-        success: true,
-        data: reports,
-        message: `Ditemukan ${reports.length} laporan dalam ${days} hari terakhir`,
-      };
-    } catch (error) {
-      return {
-        success: false,
-        error: error.message,
-      };
-    }
-  }
-
-  async getReportStatistics(days = 30) {
-    try {
-      if (days <= 0 || days > 365) {
-        return {
-          success: false,
-          error: "Jumlah hari harus antara 1-365",
-        };
-      }
-
-      const [allReports, recentReports] = await Promise.all([
-        this.reportModel.findAll(),
-        this.reportModel.getRecentReports(days),
-      ]);
-
-      const foodReportCounts = new Map();
-
-      allReports.forEach((report) => {
-        const count = foodReportCounts.get(report.id_makanan) || 0;
-        foodReportCounts.set(report.id_makanan, count + 1);
-      });
-
-      const mostReportedFoods = Array.from(foodReportCounts.entries())
-        .map(([id_makanan, report_count]) => ({ id_makanan, report_count }))
-        .sort((a, b) => b.report_count - a.report_count)
-        .slice(0, 10);
+      const summaryData = await ReportService.getConsumptionSummary(
+        userId,
+        startDateStr,
+        endDateStr
+      );
 
       return {
         success: true,
         data: {
-          total_reports: allReports.length,
-          recent_reports: recentReports.length,
-          most_reported_foods: mostReportedFoods,
+          ...summaryData,
+          period: `${days} hari terakhir`,
+          formattedTotalCalories: summaryData.totalCalories.toLocaleString(),
+          formattedAverageCalories:
+            summaryData.averageCaloriesPerDay.toLocaleString(),
         },
-        message: "Statistik laporan berhasil dihitung",
+        message: "Data ringkasan konsumsi berhasil diambil",
       };
     } catch (error) {
+      console.error("Error getting consumption summary:", error);
       return {
         success: false,
+        message: "Gagal mengambil data ringkasan konsumsi",
         error: error.message,
+        data: null,
       };
     }
   }
 
-  async getFlagedFoods(minReports = 5) {
+  // Get daily consumption data
+  static async getDailyConsumption(userId, startDate, endDate) {
     try {
-      if (minReports <= 0) {
-        return {
-          success: false,
-          error: "Minimum laporan harus lebih dari 0",
-        };
-      }
+      const data = await ReportService.getDailyConsumption(
+        userId,
+        startDate,
+        endDate
+      );
 
-      const allReports = await this.reportModel.findAll();
-
-      const foodReportCounts = new Map();
-
-      allReports.forEach((report) => {
-        const count = foodReportCounts.get(report.id_makanan) || 0;
-        foodReportCounts.set(report.id_makanan, count + 1);
-      });
-
-      const flaggedFoods = Array.from(foodReportCounts.entries())
-        .filter(([_, count]) => count >= minReports)
-        .map(([id_makanan, report_count]) => ({
-          id_makanan,
-          report_count,
-          status: "flagged",
-        }))
-        .sort((a, b) => b.report_count - a.report_count);
+      // Format the data for display
+      const formattedData = data.map((dayData) => ({
+        ...dayData,
+        foods: this.formatReportData(dayData.foods),
+        date_formatted: new Date(dayData.date).toLocaleDateString("id-ID", {
+          weekday: "long",
+          year: "numeric",
+          month: "long",
+          day: "numeric",
+        }),
+        totalCalories_formatted: dayData.totalCalories.toLocaleString(),
+      }));
 
       return {
         success: true,
-        data: flaggedFoods,
-        message: `Ditemukan ${flaggedFoods.length} makanan yang memiliki >= ${minReports} laporan`,
+        data: formattedData,
+        message: "Data konsumsi harian berhasil diambil",
       };
     } catch (error) {
+      console.error("Error getting daily consumption:", error);
       return {
         success: false,
+        message: "Gagal mengambil data konsumsi harian",
         error: error.message,
+        data: [],
       };
     }
   }
 
-  validateReportInput(reportData) {
-    if (!reportData.id_makanan || reportData.id_makanan <= 0) {
-      return { isValid: false, message: "ID makanan harus diisi dan valid" };
-    }
-
-    return { isValid: true };
-  }
-
-  async bulkDeleteReports(reportIds) {
+  // Get category statistics
+  static async getCategoryStats(userId, days = 7) {
     try {
-      if (!reportIds || reportIds.length === 0) {
-        return {
-          success: false,
-          error: "Daftar ID report tidak boleh kosong",
-        };
-      }
+      const endDate = new Date();
+      const startDate = new Date();
+      startDate.setDate(endDate.getDate() - days);
 
-      if (reportIds.some((id) => !id || id <= 0)) {
-        return {
-          success: false,
-          error: "Semua ID report harus valid",
-        };
-      }
+      const endDateStr = endDate.toISOString().split("T")[0];
+      const startDateStr = startDate.toISOString().split("T")[0];
 
-      let deletedCount = 0;
-      const errors = [];
+      const categoryStats = await ReportService.getCategoryStats(
+        userId,
+        startDateStr,
+        endDateStr
+      );
 
-      for (const id of reportIds) {
-        try {
-          const deleted = await this.reportModel.delete(id);
-          if (deleted) {
-            deletedCount++;
-          } else {
-            errors.push(`Report ID ${id} tidak ditemukan`);
-          }
-        } catch (error) {
-          errors.push(`Gagal menghapus report ID ${id}: ${error.message}`);
-        }
-      }
+      // Calculate percentages
+      const totalCalories = categoryStats.reduce(
+        (sum, cat) => sum + cat.totalCalories,
+        0
+      );
+
+      const formattedStats = categoryStats.map((stat) => ({
+        ...stat,
+        percentage:
+          totalCalories > 0
+            ? Math.round((stat.totalCalories / totalCalories) * 100)
+            : 0,
+        totalCalories_formatted: stat.totalCalories.toLocaleString(),
+        averageCalories: Math.round(stat.totalCalories / stat.count),
+      }));
 
       return {
-        success: deletedCount > 0,
-        message: `Berhasil menghapus ${deletedCount} dari ${reportIds.length} laporan`,
-        error: errors.length > 0 ? errors.join("; ") : undefined,
+        success: true,
+        data: formattedStats,
+        message: "Data statistik kategori berhasil diambil",
       };
     } catch (error) {
+      console.error("Error getting category stats:", error);
       return {
         success: false,
+        message: "Gagal mengambil data statistik kategori",
         error: error.message,
+        data: [],
       };
     }
+  }
+
+  // Get export data for PDF
+  static async getExportData(userId, startDate, endDate) {
+    try {
+      const exportData = await ReportService.getExportData(
+        userId,
+        startDate,
+        endDate
+      );
+
+      return {
+        success: true,
+        data: {
+          ...exportData,
+          reportData: this.formatReportData(exportData.reportData),
+          summary: {
+            ...exportData.summary,
+            formattedTotalCalories:
+              exportData.summary.totalCalories.toLocaleString(),
+            formattedAverageCalories:
+              exportData.summary.averageCaloriesPerDay.toLocaleString(),
+          },
+          categoryStats: exportData.categoryStats.map((stat) => ({
+            ...stat,
+            totalCalories_formatted: stat.totalCalories.toLocaleString(),
+          })),
+        },
+        message: "Data export berhasil diambil",
+      };
+    } catch (error) {
+      console.error("Error getting export data:", error);
+      return {
+        success: false,
+        message: "Gagal mengambil data export",
+        error: error.message,
+        data: null,
+      };
+    }
+  }
+
+  // Helper function to get calorie status
+  static getCalorieStatus(totalCalories) {
+    if (totalCalories > 2000) {
+      return {
+        status: "Tinggi",
+        color: "text-red-600 bg-red-50",
+        description: "Konsumsi kalori melebihi rekomendasi harian",
+      };
+    }
+    if (totalCalories > 1500) {
+      return {
+        status: "Normal",
+        color: "text-green-600 bg-green-50",
+        description: "Konsumsi kalori dalam rentang normal",
+      };
+    }
+    return {
+      status: "Rendah",
+      color: "text-yellow-600 bg-yellow-50",
+      description: "Konsumsi kalori di bawah rekomendasi harian",
+    };
+  }
+
+  // Format data for paginated display
+  static formatPaginatedData(data, page = 1, itemsPerPage = 10) {
+    const startIndex = (page - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const paginatedData = data.slice(startIndex, endIndex);
+
+    return {
+      data: paginatedData,
+      pagination: {
+        currentPage: page,
+        itemsPerPage: itemsPerPage,
+        totalItems: data.length,
+        totalPages: Math.ceil(data.length / itemsPerPage),
+        hasNextPage: page < Math.ceil(data.length / itemsPerPage),
+        hasPrevPage: page > 1,
+        startIndex: startIndex + 1,
+        endIndex: Math.min(endIndex, data.length),
+      },
+    };
+  }
+
+  // Calculate date range helpers
+  static getDateRangeByDays(days) {
+    const endDate = new Date();
+    const startDate = new Date();
+    startDate.setDate(endDate.getDate() - days);
+
+    return {
+      startDate: startDate.toISOString().split("T")[0],
+      endDate: endDate.toISOString().split("T")[0],
+      startDate_formatted: startDate.toLocaleDateString("id-ID", {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      }),
+      endDate_formatted: endDate.toLocaleDateString("id-ID", {
+        weekday: "long",
+        year: "numeric",
+        month: "long",
+        day: "numeric",
+      }),
+    };
+  }
+
+  // Format time display
+  static formatTime(timeString) {
+    if (!timeString) return "";
+    return timeString.slice(0, 5); // HH:MM format
+  }
+
+  // Check if date is today
+  static isToday(date) {
+    const today = new Date();
+    const checkDate = new Date(date);
+    return checkDate.toDateString() === today.toDateString();
+  }
+
+  // Check if date is this week
+  static isThisWeek(date) {
+    const today = new Date();
+    const checkDate = new Date(date);
+    const startOfWeek = new Date(
+      today.setDate(today.getDate() - today.getDay())
+    );
+    const endOfWeek = new Date(
+      today.setDate(today.getDate() - today.getDay() + 6)
+    );
+
+    return checkDate >= startOfWeek && checkDate <= endOfWeek;
   }
 }
