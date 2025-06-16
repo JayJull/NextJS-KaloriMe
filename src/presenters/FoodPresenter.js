@@ -316,6 +316,7 @@ export class FoodPresenter {
       console.log("Step 2: Saving to database...");
 
       // Get current time in WIB (UTC + 7)
+      const now = new Date();
       const wibTime = new Date(now.getTime() + 7 * 60 * 60 * 1000);
 
       const waktu = wibTime.toTimeString().slice(0, 8); // HH:MM:SS format
