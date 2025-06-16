@@ -64,12 +64,13 @@ export async function POST(request) {
   }
 }
 
-// GET method untuk mengambil data reports
+// GET method untuk mengambil data
 export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
     const userId = searchParams.get("userId");
-    const type = searchParams.get("type"); // 'reports', 'today', 'foods'
+    const type = searchParams.get("type");
+    const date = searchParams.get("date");
 
     if (!userId) {
       return NextResponse.json(
@@ -84,15 +85,17 @@ export async function GET(request) {
       // Get today's consumption from has_been_eaten
       data = await FoodPresenter.getTodayConsumption(userId);
     } else if (type === "foods") {
-      // Get all food reports for makanan view
-      const reports = await FoodPresenter.getAllFoodReports(userId);
-      data = FoodPresenter.formatFoodData(reports);
+      // Get consumption by date for makanan view
+      if (date) {
+        data = await FoodPresenter.getConsumptionByDate(userId, date);
+      } else {
+        data = await FoodPresenter.getTodayConsumption(userId);
+      }
+      data = FoodPresenter.formatFoodData(data);
     } else {
-      // Get all reports
-      const reports = await FoodService.getAllReports();
-      data = FoodPresenter.formatReportData(
-        reports.filter((r) => r.id_users === userId)
-      );
+      // Get all has_been_eaten data
+      const hasBeenEatenData = await FoodService.getHasBeenEatenByUser(userId);
+      data = FoodPresenter.formatReportData(hasBeenEatenData);
     }
 
     return NextResponse.json({
@@ -116,17 +119,17 @@ export async function GET(request) {
 export async function DELETE(request) {
   try {
     const { searchParams } = new URL(request.url);
-    const reportId = searchParams.get("id");
+    const recordId = searchParams.get("id");
     const userId = searchParams.get("userId");
 
-    if (!reportId || !userId) {
+    if (!recordId || !userId) {
       return NextResponse.json(
-        { success: false, message: "Report ID and User ID required" },
+        { success: false, message: "Record ID and User ID required" },
         { status: 400 }
       );
     }
 
-    const result = await FoodPresenter.deleteFoodReport(reportId, userId);
+    const result = await FoodPresenter.deleteHasBeenEaten(recordId, userId);
 
     if (!result.success) {
       return NextResponse.json(result, { status: 400 });

@@ -167,6 +167,13 @@ export class FoodPresenter {
     return matchedFood;
   }
 
+  // Check if date is today
+  static isToday(date) {
+    const today = new Date();
+    const checkDate = new Date(date);
+    return checkDate.toDateString() === today.toDateString();
+  }
+
   // Proses upload dengan Gradio API prediksi - TANPA langsung save ke database
   static async processUpload(file, userId) {
     try {
@@ -321,17 +328,6 @@ export class FoodPresenter {
       const waktu = wibTime.toTimeString().slice(0, 8); // HH:MM:SS format
       const tanggal = wibTime.toISOString().split("T")[0]; // YYYY-MM-DD format
 
-      // Prepare data untuk report
-      const reportData = {
-        nama_makanan: matchedFood.nama,
-        kategori: matchedFood.kategori,
-        kalori: matchedFood.kalori,
-        foto: imageUrl,
-        waktu: waktu,
-        tanggal: tanggal,
-        id_users: userId,
-      };
-
       // Prepare data untuk has_been_eaten
       const hasBeenEatenData = {
         nama_makanan: matchedFood.nama,
@@ -343,10 +339,7 @@ export class FoodPresenter {
         id_users: userId,
       };
 
-      // Insert ke kedua table
-      console.log("Inserting to report table:", reportData);
-      const reportResult = await FoodService.createReport(reportData);
-
+      // Insert ke has_been_eaten table
       console.log("Inserting to has_been_eaten table:", hasBeenEatenData);
       const hasBeenEatenResult = await FoodService.createHasBeenEaten(
         hasBeenEatenData
@@ -356,7 +349,6 @@ export class FoodPresenter {
         success: true,
         message: `Berhasil menambahkan ${matchedFood.nama} (${matchedFood.kalori} kalori)`,
         data: {
-          report: reportResult,
           hasBeenEaten: hasBeenEatenResult,
           matchedFood: matchedFood,
         },
@@ -396,13 +388,13 @@ export class FoodPresenter {
     }
   }
 
-  // Get all food reports for makanan view
-  static async getAllFoodReports(userId = null) {
+  // Get user's consumption by date
+  static async getConsumptionByDate(userId, date) {
     try {
-      const reports = await FoodService.getAllFoodReports(userId);
-      return this.formatReportData(reports);
+      const data = await FoodService.getHasBeenEatenByDate(userId, date);
+      return this.formatReportData(data);
     } catch (error) {
-      console.error("Error fetching food reports:", error);
+      console.error("Error fetching consumption by date:", error);
       throw error;
     }
   }
@@ -428,17 +420,17 @@ export class FoodPresenter {
     }));
   }
 
-  // Delete food report
-  static async deleteFoodReport(reportId, userId) {
+  // Delete has_been_eaten record
+  static async deleteHasBeenEaten(recordId, userId) {
     try {
-      const result = await FoodService.deleteFoodReport(reportId, userId);
+      const result = await FoodService.deleteHasBeenEaten(recordId, userId);
       return {
         success: true,
         message: "Makanan berhasil dihapus",
         data: result,
       };
     } catch (error) {
-      console.error("Error deleting food report:", error);
+      console.error("Error deleting has_been_eaten record:", error);
       return {
         success: false,
         message: "Gagal menghapus makanan",

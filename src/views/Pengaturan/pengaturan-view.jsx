@@ -164,17 +164,14 @@ const ProfileView = () => {
       }
     }
 
-    // Calculate daily calories - sama dengan ProfileModel.calculateDailyCalories
     if (berat_badan && tinggi_badan && umur) {
       const weight = parseFloat(berat_badan);
       const height = parseFloat(tinggi_badan);
       const age = parseInt(umur);
 
       if (weight > 0 && height > 0 && age > 0) {
-        // Harris-Benedict Formula - menggunakan male sebagai default
         const bmr = 88.362 + 13.397 * weight + 4.799 * height - 5.677 * age;
 
-        // Activity multipliers - sesuai dengan database values
         const activityMultipliers = {
           "tidak pernah": 1.2,
           ringan: 1.375,

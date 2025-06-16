@@ -22,10 +22,12 @@ export default function MakananView() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  // Remove local selectedDate state since it will come from Header
+  const [selectedDate, setSelectedDate] = useState(new Date());
 
   useEffect(() => {
     loadFoods();
-  }, []);
+  }, [selectedDate]); // Reload when date changes
 
   const loadFoods = async () => {
     try {
@@ -38,8 +40,11 @@ export default function MakananView() {
         return;
       }
 
+      // Format date to YYYY-MM-DD
+      const dateString = selectedDate.toISOString().split("T")[0];
+
       const response = await fetch(
-        `/api/food/upload?userId=${userId}&type=foods`
+        `/api/food/upload?userId=${userId}&type=foods&date=${dateString}`
       );
       const result = await response.json();
 
@@ -56,7 +61,25 @@ export default function MakananView() {
     }
   };
 
-  const openModal = () => setIsModalOpen(true);
+  // This function will be called from Header via App component
+  const handleDateChange = (date) => {
+    setSelectedDate(date);
+    console.log("Date changed in MakananView:", date);
+  };
+
+  const openModal = () => {
+    // Check if selected date is today
+    const today = new Date();
+    const isToday = selectedDate.toDateString() === today.toDateString();
+
+    if (!isToday) {
+      alert("Anda hanya dapat menambahkan makanan pada tanggal hari ini!");
+      return;
+    }
+
+    setIsModalOpen(true);
+  };
+
   const closeModal = () => setIsModalOpen(false);
 
   const handleUpload = async (newImage) => {
@@ -97,9 +120,30 @@ export default function MakananView() {
     loadFoods();
   };
 
+  // Helper function to check if date is today
+  const isToday = (date) => {
+    const today = new Date();
+    return date.toDateString() === today.toDateString();
+  };
+
+  // Format date for display
+  const formatDate = (date) => {
+    return date.toLocaleDateString("id-ID", {
+      weekday: "long",
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+  };
+
   if (loading) {
     return (
-      <App>
+      <App
+        title={title}
+        subtitle="Kelola makanan dan kalori Anda"
+        selectedDate={selectedDate}
+        onDateChange={handleDateChange}
+      >
         <div className="min-h-screen bg-gradient-to-br from-teal-50 to-red-50 p-6">
           <div className="max-w-7xl mx-auto">
             <div className="flex items-center justify-center h-64">
@@ -115,7 +159,12 @@ export default function MakananView() {
   }
 
   return (
-    <App>
+    <App
+      title={title}
+      subtitle="Kelola makanan dan kalori Anda"
+      selectedDate={selectedDate}
+      onDateChange={handleDateChange}
+    >
       <div className="min-h-screen bg-gradient-to-br from-teal-50 to-red-50 p-6">
         <div className="max-w-7xl mx-auto">
           {/* Header */}
@@ -124,8 +173,15 @@ export default function MakananView() {
               <div>
                 <h1 className="text-3xl font-bold text-gray-800">{title}</h1>
                 <p className="text-gray-600 mt-2">
-                  Kelola makanan dan kalori Anda
+                  Kelola makanan dan kalori Anda - {formatDate(selectedDate)}
                 </p>
+                {!isToday(selectedDate) && (
+                  <div className="mt-2 p-2 bg-yellow-100 text-yellow-700 rounded-md text-sm">
+                    <strong>Info:</strong> Anda sedang melihat data tanggal{" "}
+                    {formatDate(selectedDate)}. Penambahan makanan hanya dapat
+                    dilakukan pada hari ini.
+                  </div>
+                )}
                 {error && (
                   <div className="mt-2 p-2 bg-red-100 text-red-700 rounded-md text-sm">
                     {error}
@@ -146,7 +202,17 @@ export default function MakananView() {
                 </button>
                 <button
                   onClick={openModal}
-                  className="bg-teal-500 hover:bg-teal-600 text-white px-6 py-3 rounded-lg flex items-center gap-2 transition-colors shadow-md"
+                  className={`px-6 py-3 rounded-lg flex items-center gap-2 transition-colors shadow-md ${
+                    isToday(selectedDate)
+                      ? "bg-teal-500 hover:bg-teal-600 text-white"
+                      : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                  }`}
+                  disabled={!isToday(selectedDate)}
+                  title={
+                    !isToday(selectedDate)
+                      ? "Hanya dapat menambahkan makanan pada hari ini"
+                      : "Tambah Makanan"
+                  }
                 >
                   <Plus size={20} />
                   Tambah Makanan
@@ -243,10 +309,16 @@ export default function MakananView() {
               {foods.length === 0 && !loading && (
                 <div className="text-center py-12">
                   <p className="text-gray-500 text-lg">
-                    Belum ada data makanan
+                    {isToday(selectedDate)
+                      ? "Belum ada data makanan hari ini"
+                      : `Tidak ada data makanan pada ${formatDate(
+                          selectedDate
+                        )}`}
                   </p>
                   <p className="text-gray-400 text-sm mt-2">
-                    Klik "Tambah Makanan" untuk menambah data
+                    {isToday(selectedDate)
+                      ? 'Klik "Tambah Makanan" untuk menambah data'
+                      : "Pilih tanggal lain atau kembali ke hari ini untuk menambah data"}
                   </p>
                 </div>
               )}
