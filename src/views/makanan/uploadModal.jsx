@@ -23,7 +23,7 @@ export default function UploadModal({ isOpen, onClose, onUpload }) {
         setCameraError(null);
         stream = await navigator.mediaDevices.getUserMedia({
           video: {
-            facingMode: "environment", // Use back camera if available
+            facingMode: "environment", 
           },
         });
 

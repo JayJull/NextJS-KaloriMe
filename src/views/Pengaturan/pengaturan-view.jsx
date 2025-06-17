@@ -14,6 +14,7 @@ import {
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import App from "@/layout/app";
+import LoadingAnimation from "@/components/LoadingAnimation";
 
 const ProfileView = () => {
   const [formData, setFormData] = useState({
@@ -428,19 +429,19 @@ const ProfileView = () => {
       <div className="min-h-screen bg-gray-50">
         {/* Header */}
         <div className="px-3">
-        <div className="bg-white rounded-lg shadow-sm mt-5 max-w-4xl mx-auto">
-          <div className="max-w-2xl mx-auto py-6">
-            <div className="text-center">
-              <div className="mx-auto flex items-center justify-center mb-4">
-                {avatarLarge}
+          <div className="bg-white rounded-lg shadow-sm mt-5 max-w-4xl mx-auto">
+            <div className="max-w-2xl mx-auto py-6">
+              <div className="text-center">
+                <div className="mx-auto flex items-center justify-center mb-4">
+                  {avatarLarge}
+                </div>
+                <h1 className="text-2xl font-bold text-gray-900">
+                  {formData.nama || "User"}
+                </h1>
+                <p className="text-gray-600">{formData.email}</p>
               </div>
-              <h1 className="text-2xl font-bold text-gray-900">
-                {formData.nama || "User"}
-              </h1>
-              <p className="text-gray-600">{formData.email}</p>
             </div>
           </div>
-        </div>
         </div>
 
         <div className="max-w-4xl mx-auto px-3 py-8 text-black">
@@ -792,6 +793,12 @@ const ProfileView = () => {
             </div>
           </form>
         </div>
+        <LoadingAnimation
+          isVisible={loading}
+          message="Memperbarui Profil"
+          subtitle="Menyimpan perubahan data Anda..."
+          variant="default"
+        />
       </div>
     </App>
   );

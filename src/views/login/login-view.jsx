@@ -3,6 +3,7 @@ import Image from "next/image";
 import { FiMail, FiLock, FiArrowRight, FiLoader } from "react-icons/fi";
 import RegisterModal from "@/views/register/RegisterModal";
 import LoginModal from "@/views/login/LoginModal";
+import LoadingAnimation from "@/components/LoadingAnimation";
 import { useState } from "react";
 import { AnimatePresence } from "framer-motion";
 import { signIn } from "next-auth/react";
@@ -16,6 +17,7 @@ const LoginView = ({ onSwitchToRegister }) => {
   const [error, setError] = useState(null);
   const [fieldErrors, setFieldErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+  const [showSuccessLoading, setShowSuccessLoading] = useState(false);
 
   const router = useRouter();
 
@@ -58,20 +60,29 @@ const LoginView = ({ onSwitchToRegister }) => {
       });
 
       if (res?.ok) {
+        // Show success loading animation
+        setIsLoading(false);
+        setShowSuccessLoading(true);
+
         const response = await fetch("/api/session-user");
         const data = await response.json();
 
         if (data?.user?.id) {
           localStorage.setItem("userId", data.user.id);
         }
-        router.push("/dashboard");
+
+        // Wait for 2 seconds to show success animation
+        setTimeout(() => {
+          setShowSuccessLoading(false);
+          router.push("/dashboard");
+        }, 2000);
       } else {
         setError("Email atau password salah. Silakan periksa kembali.");
+        setIsLoading(false);
       }
     } catch (error) {
       console.error("Login error:", error);
       setError("Terjadi kesalahan saat login. Silakan coba lagi.");
-    } finally {
       setIsLoading(false);
     }
   };
@@ -79,24 +90,41 @@ const LoginView = ({ onSwitchToRegister }) => {
   const handleSocialLogin = async (provider) => {
     try {
       setError(null);
+      setShowSuccessLoading(true);
+
       const result = await signIn(provider, {
         callbackUrl: "/dashboard",
-        redirect: true,
+        redirect: false, // Changed to false to handle redirect manually
       });
 
-      // signIn dengan redirect: true akan langsung redirect,
-      // jadi kode di bawah mungkin tidak akan dieksekusi
-      if (result?.error) {
+      if (result?.ok) {
+        // Wait for animation then redirect
+        setTimeout(() => {
+          setShowSuccessLoading(false);
+          router.push("/dashboard");
+        }, 2000);
+      } else if (result?.error) {
+        setShowSuccessLoading(false);
         setError(`Gagal login dengan ${provider}. Silakan coba lagi.`);
       }
     } catch (error) {
       console.error(`${provider} login error:`, error);
+      setShowSuccessLoading(false);
       setError(`Terjadi kesalahan saat login dengan ${provider}.`);
     }
   };
 
   return (
     <>
+      {/* Success Loading Animation */}
+      <LoadingAnimation
+        message="Login Berhasil! 🎉"
+        subtitle="Sedang mengarahkan ke dashboard..."
+        isVisible={showSuccessLoading}
+        variant="success"
+        showLogo={true}
+      />
+
       <div className="w-full max-w-md bg-white rounded-xl overflow-hidden p-8">
         <div className="flex flex-col items-center space-y-4 mb-8">
           <Image
@@ -203,10 +231,12 @@ const LoginView = ({ onSwitchToRegister }) => {
             type="submit"
             disabled={
               isLoading ||
+              showSuccessLoading ||
               Object.values(fieldErrors).some((error) => error !== null)
             }
             className={`w-full flex justify-center items-center py-3 px-6 rounded-full font-semibold shadow-md transition-all duration-300 ${
               isLoading ||
+              showSuccessLoading ||
               Object.values(fieldErrors).some((error) => error !== null)
                 ? "bg-gray-400 cursor-not-allowed text-gray-600"
                 : "bg-teal-600 hover:bg-teal-700 text-white hover:shadow-lg transform hover:-translate-y-0.5"
@@ -215,6 +245,30 @@ const LoginView = ({ onSwitchToRegister }) => {
             {isLoading ? (
               <>
                 <FiLoader className="animate-spin mr-2" /> Memproses...
+              </>
+            ) : showSuccessLoading ? (
+              <>
+                <svg
+                  className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
+                </svg>
+                Berhasil!
               </>
             ) : (
               <>
@@ -258,7 +312,12 @@ const LoginView = ({ onSwitchToRegister }) => {
           <div>
             <button
               type="button"
-              className="w-full inline-flex justify-center items-center px-4 py-3 border border-gray-300 rounded-lg bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors duration-200"
+              disabled={isLoading || showSuccessLoading}
+              className={`w-full inline-flex justify-center items-center px-4 py-3 border border-gray-300 rounded-lg bg-white text-sm font-medium text-gray-700 transition-colors duration-200 ${
+                isLoading || showSuccessLoading
+                  ? "opacity-50 cursor-not-allowed"
+                  : "hover:bg-gray-50"
+              }`}
               onClick={() => handleSocialLogin("google")}
             >
               <img

@@ -6,13 +6,24 @@ export default withAuth(
     const { pathname } = req.nextUrl;
     const token = req.nextauth.token;
 
-    // Jika user sudah login dan mengakses halaman auth, redirect ke dashboard/home
+    // Jika user sudah login dan mengakses halaman auth, redirect ke dashboard
     if (token && (pathname === "/login" || pathname === "/register")) {
       return NextResponse.redirect(new URL("/dashboard", req.url));
     }
 
+    // Daftar protected routes
+    const protectedPaths = [
+      "/dashboard",
+      "/laporan",
+      "/makanan",
+      "/pengaturan",
+    ];
+
     // Jika user belum login dan mengakses protected routes
-    if (!token && pathname.startsWith("/dashboard")) {
+    const isProtectedRoute = protectedPaths.some((path) =>
+      pathname.startsWith(path)
+    );
+    if (!token && isProtectedRoute) {
       // Redirect ke home dengan parameter untuk show login modal
       const url = new URL("/", req.url);
       url.searchParams.set("showLogin", "1");
@@ -32,21 +43,26 @@ export default withAuth(
         // Halaman public yang tidak perlu authentication
         const publicPaths = ["/", "/about", "/contact"];
 
-        // Jika mengakses halaman public, izinkan tanpa token
         if (publicPaths.includes(pathname)) {
           return true;
         }
 
-        // Jika mengakses halaman auth dan sudah ada token, izinkan (akan di-redirect di middleware)
+        // Jika mengakses halaman auth dan sudah ada token, izinkan (redirect ditangani di middleware)
         if ((pathname === "/login" || pathname === "/register") && token) {
           return true;
         }
 
-        // Untuk protected routes, cek apakah ada token
-        if (
-          pathname.startsWith("/dashboard") ||
-          pathname.startsWith("/profile")
-        ) {
+        // Daftar protected routes
+        const protectedPaths = [
+          "/dashboard",
+          "/laporan",
+          "/makanan",
+          "/pengaturan",
+        ];
+        const isProtectedRoute = protectedPaths.some((path) =>
+          pathname.startsWith(path)
+        );
+        if (isProtectedRoute) {
           return !!token;
         }
 
